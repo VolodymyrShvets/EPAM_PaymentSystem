@@ -1,0 +1,87 @@
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ page import="model.Bank.BankAccount" %>
+<%@ page import="java.util.List" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<fmt:setLocale value="${sessionScope.lang}"/>
+<fmt:setBundle basename="messages"/>
+
+<html lang="${sessionScope.lang}">
+<head>
+    <title><fmt:message key="label.paymentPageTitle"/></title>
+    <style>
+        div {
+            margin-top: 10%;
+            font-size: larger;
+        }
+
+        table {
+            font-size: larger;
+            padding: 0 15px 0 15px;
+        }
+    </style>
+</head>
+<body>
+<div align="center">
+    <p>
+    <h2><fmt:message key="label.paymentPageH2"/></h2>
+    <h3><fmt:message key="label.paymentPage1"/><br><fmt:message key="label.paymentPage2"/></h3></p>
+    <form action="<%=request.getContextPath()%>/newPayment" method="post">
+        <%
+            HttpSession session1 = request.getSession();
+            session1.setAttribute("accountID", request.getParameter("id"));
+        %>
+        <table>
+            <tr>
+                <td>
+                    <fmt:message key="label.selectAccID"/>
+                </td>
+                <td>
+                    <select name="senderID">
+                        <%
+                            List<BankAccount> accounts = (List<BankAccount>) session.getAttribute("accountsList");
+                            for (BankAccount account : accounts) {
+                                if (!account.isBlocked()) {%>
+                        <option value="<%=account.getAccountID()%>"><%=account.getAccountID() + " - " + account.getCard().getMoneyAmount()%>
+                        </option>
+                        <%
+                                }
+                            }
+                        %>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fmt:message key="label.recipientID"/>
+                </td>
+                <td>
+                    <input id="recipient" type="number" pattern="\d{9}" step="1" name="recipientID">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fmt:message key="label.amount"/>
+                </td>
+                <td>
+                    <input id="amount" type="number" min="0" step="0.01" name="amount">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fmt:message key="label.confirmation"/>
+                </td>
+                <td>
+                    <input id="cvv2" type="number" pattern="\d{3}" step="1" name="cvv2">
+                </td>
+            </tr>
+        </table>
+        <p class="paymentError">${sessionScope.paymentError}</p>
+        <% session1.setAttribute("paymentError", "");%>
+        <p>
+            <button type="submit"><fmt:message key="label.pay"/></button>
+        </p>
+    </form>
+</div>
+</body>
+</html>
