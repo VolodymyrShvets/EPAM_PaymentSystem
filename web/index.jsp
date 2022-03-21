@@ -22,11 +22,11 @@
             font-size: larger;
         }
 
-        input:invalid:required{
+        input:invalid:required {
             border: 2px solid red;
         }
 
-        input:valid{
+        input:valid {
             border: 2px solid black;
         }
     </style>

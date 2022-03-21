@@ -18,11 +18,11 @@
             padding: 0 15px 0 15px;
         }
 
-        input:invalid{
+        input:invalid {
             border: 2px solid red;
         }
 
-        input:valid{
+        input:valid {
             border: 2px solid black;
         }
     </style>

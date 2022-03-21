@@ -20,11 +20,11 @@
             padding: 0 15px 0 15px;
         }
 
-        input:invalid{
+        input:invalid {
             border: 2px solid red;
         }
 
-        input:valid{
+        input:valid {
             border: 2px solid black;
         }
     </style>
@@ -64,7 +64,8 @@
                     <fmt:message key="label.recipientID"/>
                 </td>
                 <td>
-                    <input id="recipient" type="number" pattern="\d{9}" step="1" name="recipientID" required title="9-<fmt:message key="label.recipIDvalid"/>">
+                    <input id="recipient" type="number" pattern="\d{9}" step="1" name="recipientID" required
+                           title="9-<fmt:message key="label.recipIDvalid"/>">
                 </td>
             </tr>
             <tr>
@@ -80,7 +81,8 @@
                     <fmt:message key="label.confirmation"/>
                 </td>
                 <td>
-                    <input id="cvv2" type="number" pattern="\d{3}" step="1" name="cvv2" required title="3-<fmt:message key="label.cvv2valid"/>">
+                    <input id="cvv2" type="number" pattern="\d{3}" step="1" name="cvv2" required
+                           title="3-<fmt:message key="label.cvv2valid"/>">
                 </td>
             </tr>
         </table>
