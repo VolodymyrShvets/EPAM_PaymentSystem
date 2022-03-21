@@ -21,6 +21,14 @@
         table {
             font-size: larger;
         }
+
+        input:invalid{
+            border: 2px solid red;
+        }
+
+        input:valid{
+            border: 2px solid black;
+        }
     </style>
 </head>
 <body>
@@ -37,25 +45,25 @@
             <tr>
                 <td><fmt:message key="label.firstName"/></td>
                 <td><label>
-                    <input type="text" name="firstName">
+                    <input type="text" name="firstName" required maxlength="20">
                 </label></td>
             </tr>
             <tr>
                 <td><fmt:message key="label.LastName"/></td>
                 <td><label>
-                    <input type="text" name="lastName">
+                    <input type="text" name="lastName" required maxlength="20">
                 </label></td>
             </tr>
             <tr>
                 <td><fmt:message key="label.login"/></td>
                 <td><label>
-                    <input type="text" name="userLogin">
+                    <input type="text" name="userLogin" required minlength="6" maxlength="45">
                 </label></td>
             </tr>
             <tr>
                 <td><fmt:message key="label.password"/></td>
                 <td><label>
-                    <input type="password" name="userPassword">
+                    <input type="password" name="userPassword" required minlength="8" maxlength="45">
                 </label></td>
             </tr>
         </table>

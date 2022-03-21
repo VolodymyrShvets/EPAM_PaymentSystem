@@ -19,6 +19,14 @@
             font-size: larger;
             padding: 0 15px 0 15px;
         }
+
+        input:invalid{
+            border: 2px solid red;
+        }
+
+        input:valid{
+            border: 2px solid black;
+        }
     </style>
 </head>
 <body>
@@ -56,7 +64,7 @@
                     <fmt:message key="label.recipientID"/>
                 </td>
                 <td>
-                    <input id="recipient" type="number" pattern="\d{9}" step="1" name="recipientID">
+                    <input id="recipient" type="number" pattern="\d{9}" step="1" name="recipientID" required title="9-<fmt:message key="label.recipIDvalid"/>">
                 </td>
             </tr>
             <tr>
@@ -64,7 +72,7 @@
                     <fmt:message key="label.amount"/>
                 </td>
                 <td>
-                    <input id="amount" type="number" min="0" step="0.01" name="amount">
+                    <input id="amount" type="number" min="0" max="100000" step="0.01" name="amount" required>
                 </td>
             </tr>
             <tr>
@@ -72,7 +80,7 @@
                     <fmt:message key="label.confirmation"/>
                 </td>
                 <td>
-                    <input id="cvv2" type="number" pattern="\d{3}" step="1" name="cvv2">
+                    <input id="cvv2" type="number" pattern="\d{3}" step="1" name="cvv2" required title="3-<fmt:message key="label.cvv2valid"/>">
                 </td>
             </tr>
         </table>

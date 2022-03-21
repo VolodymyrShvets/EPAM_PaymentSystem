@@ -17,6 +17,14 @@
             font-size: larger;
             padding: 0 15px 0 15px;
         }
+
+        input:invalid{
+            border: 2px solid red;
+        }
+
+        input:valid{
+            border: 2px solid black;
+        }
     </style>
 </head>
 <body>
@@ -30,7 +38,7 @@
             session1.setAttribute("accountID", request.getParameter("id"));
         %>
         <label for="amount"><fmt:message key="label.amount"/></label>
-        <input id="amount" type="number" min="0" step="0.01" name="amount">
+        <input id="amount" type="number" min="0.01" max="100000" step="0.01" name="amount" required>
         <p>
             <button type="submit"><fmt:message key="label.funding"/></button>
         </p>
