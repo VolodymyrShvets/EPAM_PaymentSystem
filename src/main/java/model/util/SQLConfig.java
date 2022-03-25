@@ -1,6 +1,5 @@
 package model.util;
 
-import com.sun.org.apache.bcel.internal.util.ClassQueue;
 import model.Bank.*;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
@@ -209,39 +208,15 @@ public class SQLConfig {
         return SQL_GET_USER_PAYMENTS_QUERY;
     }
 
-    public String[] getInfo(String userLogin, String userPassword) {
-        String[] values = new String[4];
-
-        try (Connection connection = DriverManager
-                .getConnection(url, login, password)) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
-            PreparedStatement statement = connection.prepareStatement("select firstName, lastName, ID, userRole from Users where userLogin = ? and userPassword = ?");
-            statement.setString(1, userLogin);
-            statement.setString(2, userPassword);
-
-            ResultSet rs = statement.executeQuery();
-            rs.next();
-            values[0] = rs.getString("firstName");
-            values[1] = rs.getString("lastName");
-            values[2] = rs.getString("ID");
-            values[3] = rs.getString("userRole");
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return values;
-    }
-
-    public User getUser(String userLogin, String userPassword) {
+    public User getUser(String userLogin) {
         User user = null;
 
         try (Connection connection = DriverManager
                 .getConnection(url, login, password)) {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
-            PreparedStatement statement = connection.prepareStatement("select * from Users where userLogin = ? and userPassword = ?");
+            PreparedStatement statement = connection.prepareStatement("select * from Users where userLogin = ?");
             statement.setString(1, userLogin);
-            statement.setString(2, userPassword);
 
             ResultSet rs = statement.executeQuery();
             rs.next();
@@ -295,8 +270,8 @@ public class SQLConfig {
         userRole ENUM('USER', 'ADMIN') NOT NULL DEFAULT('USER'),
         firstName VARCHAR(20) NOT NULL,
         lastName VARCHAR(20) NOT NULL,
-        userLogin VARCHAR(45) NOT NULL,
-        userPassword VARCHAR(45) NOT NULL
+        userLogin VARCHAR(45) NOT NULL UNIQUE,
+        userPassword VARCHAR(170) NOT NULL
    );
 
     CREATE TABLE CreditCard (
@@ -330,18 +305,5 @@ public class SQLConfig {
         userID INT UNSIGNED REFERENCES Users(ID),
         accountID INT UNSIGNED REFERENCES BankAccount(ID)
     );
-
-     */
-    /*
-    ===================  USEFUL QUERIES  ================================
-
-    =-=-=-=-=-=     select bank account and related cards info
-    SELECT BC.ID, BC.userID, BC.accountStatus,
-	CC.cardNumber, CC.cvv2, CC.expirationDate, CC.moneyAmount
-    FROM BankAccount AS BC LEFT JOIN CreditCard AS CC ON BC.card = CC.cardNumber
-    WHERE BC.userID = 887368781
-    =-=-=-=-=-=
-
-
      */
 }
