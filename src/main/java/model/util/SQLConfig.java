@@ -1,6 +1,6 @@
 package model.util;
 
-import model.Bank.*;
+import model.bank.*;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
 import model.enums.RequestType;

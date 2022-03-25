@@ -1,7 +1,7 @@
 package admin;
 
-import model.Bank.BankAccount;
-import model.Bank.User;
+import model.bank.BankAccount;
+import model.bank.User;
 import model.enums.RequestType;
 import model.util.SQLConfig;
 

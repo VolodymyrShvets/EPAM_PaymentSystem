@@ -1,6 +1,6 @@
 package mainpageservlets;
 
-import model.Bank.BankAccount;
+import model.bank.BankAccount;
 import model.util.SQLConfig;
 
 import javax.servlet.RequestDispatcher;
@@ -47,6 +47,7 @@ public class AccountBlockingServlet extends HttpServlet {
             ex.printStackTrace();
         }
 
+        // TODO update all PRG relationships ( sendRedirect -> forward )
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
         dispatcher.forward(req, resp);
     }

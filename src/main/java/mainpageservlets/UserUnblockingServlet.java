@@ -1,6 +1,6 @@
 package mainpageservlets;
 
-import model.Bank.UserRequest;
+import model.bank.UserRequest;
 import model.util.SQLConfig;
 
 import javax.servlet.RequestDispatcher;

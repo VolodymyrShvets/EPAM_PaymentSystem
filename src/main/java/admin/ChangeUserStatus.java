@@ -1,6 +1,6 @@
 package admin;
 
-import model.Bank.User;
+import model.bank.User;
 import model.enums.RequestType;
 import model.util.SQLConfig;
 

@@ -1,11 +1,11 @@
 package login;
 
-import model.Bank.BankAccount;
-import model.Bank.Payment;
-import model.Bank.User;
+import model.bank.BankAccount;
+import model.bank.Payment;
+import model.bank.User;
 import model.enums.AccUsrStatus;
 import model.enums.UserRole;
-import model.util.Util;
+import model.util.Utility;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -23,8 +23,8 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String userName = Util.encode(req.getParameter("username"));
-        String password = Util.encode(req.getParameter("password"));
+        String userName = Utility.encode(req.getParameter("username"));
+        String password = Utility.encode(req.getParameter("password"));
 
         LoginBean loginBean = new LoginBean();
         loginBean.setUsername(userName);

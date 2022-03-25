@@ -1,7 +1,7 @@
 package mainpageservlets;
 
-import model.Bank.BankAccount;
-import model.Bank.Payment;
+import model.bank.BankAccount;
+import model.bank.Payment;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
 import model.util.SQLConfig;

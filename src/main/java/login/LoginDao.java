@@ -1,11 +1,11 @@
 package login;
 
-import model.Bank.BankAccount;
-import model.Bank.Payment;
-import model.Bank.User;
-import model.Bank.UserRequest;
+import model.bank.BankAccount;
+import model.bank.Payment;
+import model.bank.User;
+import model.bank.UserRequest;
 import model.util.SQLConfig;
-import model.util.Util;
+import model.util.Utility;
 
 import java.sql.*;
 import java.util.List;
@@ -26,7 +26,7 @@ public class LoginDao {
             ResultSet rs = statement.executeQuery();
 
             if (rs.next()) {
-                if(Util.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
+                if(Utility.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
                     status = true;
                 }
             }

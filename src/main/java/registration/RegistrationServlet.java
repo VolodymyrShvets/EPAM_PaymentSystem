@@ -2,10 +2,10 @@ package registration;
 
 import login.LoginBean;
 import login.LoginDao;
-import model.Bank.BankAccount;
-import model.Bank.Payment;
-import model.Bank.User;
-import model.util.Util;
+import model.bank.BankAccount;
+import model.bank.Payment;
+import model.bank.User;
+import model.util.Utility;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -25,10 +25,10 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String firstName = Util.encode(req.getParameter("firstName"));
-        String lastName = Util.encode(req.getParameter("lastName"));
-        String userLogin = Util.encode(req.getParameter("userLogin"));
-        String userPassword = Util.hash(Util.encode(req.getParameter("userPassword")));
+        String firstName = Utility.encode(req.getParameter("firstName"));
+        String lastName = Utility.encode(req.getParameter("lastName"));
+        String userLogin = Utility.encode(req.getParameter("userLogin"));
+        String userPassword = Utility.hash(Utility.encode(req.getParameter("userPassword")));
 
         LoginBean loginBean = new LoginBean();
         loginBean.setUsername(userLogin);

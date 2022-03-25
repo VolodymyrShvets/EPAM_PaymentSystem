@@ -1,8 +1,8 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="model.Bank.UserRequest" %>
+<%@ page import="model.bank.UserRequest" %>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Bank.User" %>
-<%@ page import="model.Bank.BankAccount" %>
+<%@ page import="model.bank.User" %>
+<%@ page import="model.bank.BankAccount" %>
 <%@ page import="model.enums.RequestType" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 

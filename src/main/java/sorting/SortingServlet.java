@@ -1,7 +1,7 @@
 package sorting;
 
-import model.Bank.BankAccount;
-import model.Bank.Payment;
+import model.bank.BankAccount;
+import model.bank.Payment;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;

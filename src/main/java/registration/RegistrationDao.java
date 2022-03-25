@@ -1,6 +1,6 @@
 package registration;
 
-import model.Bank.User;
+import model.bank.User;
 import model.util.SQLConfig;
 
 import java.sql.Connection;

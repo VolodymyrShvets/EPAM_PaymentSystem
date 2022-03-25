@@ -8,7 +8,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
-public final class Util {
+public final class Utility {
     public static long createRandomNumber(long len) {
         if (len > 18)
             throw new IllegalStateException("Too many digits");
