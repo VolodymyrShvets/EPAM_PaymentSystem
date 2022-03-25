@@ -35,7 +35,7 @@ public class RegistrationDao {
         return result;
     }
 
-    public String[] getNameAndID(User user) {
-        return config.getInfo(user.getUserLogin(), user.getUserPassword());
+    public User getNameAndID(User user) {
+        return config.getUser(user.getUserLogin());
     }
 }

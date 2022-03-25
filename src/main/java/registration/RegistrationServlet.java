@@ -28,8 +28,7 @@ public class RegistrationServlet extends HttpServlet {
         String firstName = Util.encode(req.getParameter("firstName"));
         String lastName = Util.encode(req.getParameter("lastName"));
         String userLogin = Util.encode(req.getParameter("userLogin"));
-        String userPassword = Util.encode(req.getParameter("userPassword"));
-
+        String userPassword = Util.hash(Util.encode(req.getParameter("userPassword")));
 
         LoginBean loginBean = new LoginBean();
         loginBean.setUsername(userLogin);
@@ -54,9 +53,9 @@ public class RegistrationServlet extends HttpServlet {
                 RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
                 dispatcher.forward(req, resp);
             } else if (registrationDao.registerUser(user) == 1) {
-                String[] values = registrationDao.getNameAndID(user);
-                String sessionName = values[0];
-                String userID = values[1];
+                User newUser = registrationDao.getNameAndID(user);
+                String sessionName = newUser.getFirstName();
+                Long userID = newUser.getUserID();
                 HttpSession session = req.getSession();
                 session.setAttribute("userName", sessionName);
                 session.setAttribute("userID", userID);

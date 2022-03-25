@@ -5,6 +5,7 @@ import model.Bank.Payment;
 import model.Bank.User;
 import model.Bank.UserRequest;
 import model.util.SQLConfig;
+import model.util.Util;
 
 import java.sql.*;
 import java.util.List;
@@ -19,12 +20,16 @@ public class LoginDao {
 
         try (Connection connection = DriverManager
                 .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            PreparedStatement statement = connection.prepareStatement("select * from Users where userLogin = ? and userPassword = ?");
+            PreparedStatement statement = connection.prepareStatement("select userPassword from Users where userLogin = ? ");
             statement.setString(1, loginBean.getUsername());
-            statement.setString(2, loginBean.getPassword());
 
             ResultSet rs = statement.executeQuery();
-            status = rs.next();
+
+            if (rs.next()) {
+                if(Util.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
+                    status = true;
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -36,7 +41,7 @@ public class LoginDao {
     }
 
     public User getUser(LoginBean loginBean) {
-        return config.getUser(loginBean.getUsername(), loginBean.getPassword());
+        return config.getUser(loginBean.getUsername());
     }
 
     public List<Payment> getUserPayments(String userID) {
