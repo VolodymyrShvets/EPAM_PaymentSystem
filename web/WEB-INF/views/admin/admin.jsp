@@ -128,9 +128,7 @@
         <th><fmt:message key="label.userAccountID"/></th>
         <th><fmt:message key="label.userAccStatus"/></th>
         <th><fmt:message key="label.accTableCNumb"/></th>
-        <th><fmt:message key="label.accTableCVV2"/></th>
         <th><fmt:message key="label.accTableExpDate"/></th>
-        <th><fmt:message key="label.accTableMoneyAmount"/></th>
         <th><fmt:message key="label.reqOperation"/></th>
     </tr>
     <%
@@ -152,8 +150,6 @@
         <td><%=user.getFirstName() + " " + user.getLastName()%>
         </td>
         <%}%>
-        <td></td>
-        <td></td>
         <td></td>
         <td></td>
         <td></td>
@@ -186,11 +182,7 @@
         </td>
         <td id="blocked"><%=account.getCard().getCardNumber()%>
         </td>
-        <td id="blocked"><%=account.getCard().getCvv2()%>
-        </td>
         <td id="blocked"><%=account.getCard().getExpirationDate()%>
-        </td>
-        <td id="blocked"><%=account.getCard().getMoneyAmount()%>
         </td>
         <%if (account.isBlocked()) {%>
         <td id="unblocked">
@@ -213,11 +205,7 @@
         </td>
         <td><%=account.getCard().getCardNumber()%>
         </td>
-        <td><%=account.getCard().getCvv2()%>
-        </td>
         <td><%=account.getCard().getExpirationDate()%>
-        </td>
-        <td><%=account.getCard().getMoneyAmount()%>
         </td>
         <%if (account.isBlocked()) {%>
         <td id="unblocked">
