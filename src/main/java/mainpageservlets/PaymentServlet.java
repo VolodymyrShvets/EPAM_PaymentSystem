@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.List;
 
 @WebServlet("/newPayment")
@@ -25,15 +26,24 @@ public class PaymentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         long userID = (long) session.getAttribute("userID");
+        String paymentType = req.getParameter("paymentType");
         String senderId = req.getParameter("senderID");
         String recipientID = req.getParameter("recipientID");
         String amount = req.getParameter("amount");
+        String paymentDate = req.getParameter("paymentDate");
         String cvv2 = req.getParameter("cvv2");
 
         List<Payment> payments;
 
         BankAccount sender = config.getAccount(senderId);
         BankAccount recipient = config.getAccount(recipientID);
+
+        if (paymentType == null) {
+            session.setAttribute("paymentError", "Payment type should be non-null.");
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
+            dispatcher.forward(req, resp);
+            return;
+        }
 
         if (sender.getCard().getMoneyAmount() < Double.parseDouble(amount)) {
             session.setAttribute("paymentError", "Not enough money on account.");
@@ -78,7 +88,12 @@ public class PaymentServlet extends HttpServlet {
                 return;
             }
 
-            Payment payment = new Payment(PaymentStatus.SENT, recipient, recipientName, sender, senderName, Double.parseDouble(amount));
+            Payment payment;
+            if (paymentType.equalsIgnoreCase(PaymentStatus.SENT.name()))
+                payment = new Payment(PaymentStatus.SENT, recipient, recipientName, sender, senderName, Double.parseDouble(amount));
+            else
+                payment = new Payment(PaymentStatus.PREPARED, LocalDate.parse(paymentDate), recipient, recipientName, sender, senderName, Double.parseDouble(amount));
+
             PreparedStatement insertNewPaymentStatement = connection.prepareStatement(SQL_INSERT_NEW_PAYMENT_QUERY);
             insertNewPaymentStatement.setString(1, payment.getStatus().name());
             insertNewPaymentStatement.setDate(2, Date.valueOf(payment.getPaymentDate()));
@@ -104,14 +119,15 @@ public class PaymentServlet extends HttpServlet {
             System.out.println("cards updated :  " + result);
 
             //----------------------
-            moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
+            if (payment.getStatus().equals(PaymentStatus.SENT)) {
+                moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
 
-            moneyAmountUpdate.setDouble(1, recipient.getCard().getMoneyAmount());
-            moneyAmountUpdate.setLong(2, recipient.getCard().getCardNumber());
+                moneyAmountUpdate.setDouble(1, recipient.getCard().getMoneyAmount());
+                moneyAmountUpdate.setLong(2, recipient.getCard().getCardNumber());
 
-            result = moneyAmountUpdate.executeUpdate();
-            System.out.println("cards updated :  " + result);
-
+                result = moneyAmountUpdate.executeUpdate();
+                System.out.println("cards updated :  " + result);
+            }
             //----------------------
 
             payments = config.getAllUserPayments(String.valueOf(userID));
