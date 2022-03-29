@@ -24,6 +24,16 @@ public class Payment {
         this.paymentSum = paymentSum;
     }
 
+    public Payment(PaymentStatus status, LocalDate paymentDate, BankAccount recipient, String recipientName, BankAccount sender, String senderName, double paymentSum) {
+        this.status = status;
+        this.paymentDate = paymentDate;
+        this.recipient = recipient;
+        this.recipientName = recipientName;
+        this.sender = sender;
+        this.senderName = senderName;
+        this.paymentSum = paymentSum;
+    }
+
     public Payment(long paymentID, PaymentStatus status, LocalDate paymentDate, BankAccount recipient, String recipientName, BankAccount sender, String senderName, double paymentSum) {
         this.paymentID = paymentID;
         this.status = status;
