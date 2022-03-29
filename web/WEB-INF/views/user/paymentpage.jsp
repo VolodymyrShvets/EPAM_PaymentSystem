@@ -1,6 +1,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ page import="model.bank.BankAccount" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${sessionScope.lang}"/>
@@ -33,12 +34,21 @@
 <div align="center">
     <p>
     <h2><fmt:message key="label.paymentPageH2"/></h2>
-    <h3><fmt:message key="label.paymentPage1"/><br><fmt:message key="label.paymentPage2"/></h3></p>
+    <h3><fmt:message key="label.paymentPage1"/><br><fmt:message key="label.paymentPage2"/><br><fmt:message
+            key="label.paymentPage3"/></h3></p>
     <form action="<%=request.getContextPath()%>/newPayment" method="post">
         <%
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));
         %>
+        <p>
+            <input type="radio" id="sentPayment"
+                   name="paymentType" value="SENT" required>
+            <label for="sentPayment"><fmt:message key="label.paymentSent"/></label>
+            <input type="radio" id="preparedPayment"
+                   name="paymentType" value="PREPARED">
+            <label for="preparedPayment"><fmt:message key="label.paymentPrepared"/></label>
+        </p>
         <table>
             <tr>
                 <td>
@@ -74,6 +84,14 @@
                 </td>
                 <td>
                     <input id="amount" type="number" min="0" max="100000" step="0.01" name="amount" required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <fmt:message key="label.paymentDate"/>
+                </td>
+                <td>
+                    <input id="payDate" type="date" name="paymentDate" value="<%=LocalDate.now()%>" min="<%=LocalDate.now()%>">
                 </td>
             </tr>
             <tr>
