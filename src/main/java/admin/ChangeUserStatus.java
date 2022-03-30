@@ -3,6 +3,8 @@ package admin;
 import model.bank.User;
 import model.enums.RequestType;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @WebServlet("/change-user-status")
 public class ChangeUserStatus extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(ChangeUserStatus.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
@@ -52,11 +55,13 @@ public class ChangeUserStatus extends HttpServlet {
                     config.deleteAllRequests(String.valueOf(userID), RequestType.USER);
                 }
 
+                logger.info(String.format("Updated User status: for ID=%s STATUS=%s", userB.getUserID(), userB.getStatus()));
+
                 List<User> list = config.getAllUsers();
                 session.setAttribute("users", list);
                 session.setAttribute("requests", config.getAllRequests());
             } catch (SQLException | ClassNotFoundException ex) {
-                ex.printStackTrace();
+                logger.error("Caught Exception: ", ex);
             }
         }
 

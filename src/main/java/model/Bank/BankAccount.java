@@ -74,25 +74,12 @@ public class BankAccount {
 
     // пополнение
     public void funding(double fundingSum) {
-        if (status.equals(AccUsrStatus.ACTIVE)) {
-            System.out.println("funding... to " + accountID);
-            card.funding(fundingSum);
-            System.out.println("done.");
-        } else
-            System.out.println("Account BLOCKED. Unable to perform replenishment.");
+        card.funding(fundingSum);
     }
 
     // снятие
     public void withdrawal(double withdrawalSum) {
-        if (status.equals(AccUsrStatus.ACTIVE)) {
-            System.out.println("withdrawal... from " + accountID);
-            if (withdrawalSum <= card.getMoneyAmount()) {
-                card.withdrawal(withdrawalSum);
-                System.out.println("done.");
-            } else
-                throw new IllegalArgumentException("Withdrawal sum is bigger than amount of money on card!!!");
-        } else
-            System.out.println("Account BLOCKED. Unable to perform withdrawal.");
+        card.withdrawal(withdrawalSum);
     }
 
     public void printAccountState() {

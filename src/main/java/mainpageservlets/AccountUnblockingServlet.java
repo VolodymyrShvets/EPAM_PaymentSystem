@@ -1,8 +1,9 @@
 package mainpageservlets;
 
-
 import model.bank.UserRequest;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,18 +17,19 @@ import java.sql.*;
 
 @WebServlet("/unblock")
 public class AccountUnblockingServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(AccountUnblockingServlet.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         Long userID = (Long) session.getAttribute("userID");
-        System.out.println(userID);
         String accountID = req.getParameter("accountID");
-        System.out.println(accountID);
 
         UserRequest request = new UserRequest();
         request.createAccountUnblockingRequest(Long.parseLong(accountID), userID);
+
+        logger.info("Attempt to create new AccountRequest.");
 
         try(Connection connection = DriverManager.getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -38,11 +40,12 @@ public class AccountUnblockingServlet extends HttpServlet {
             requestStatement.setLong(2, request.getUserID());
             requestStatement.setLong(3, request.getAccountID());
 
-            int res = requestStatement.executeUpdate();
-            System.out.println("inserted requests : " + res);
+            requestStatement.executeUpdate();
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
+        logger.info("Created new AccountRequest for UserID=" + userID + " and AccountID=" + accountID);
+
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
         dispatcher.forward(req, resp);
     }

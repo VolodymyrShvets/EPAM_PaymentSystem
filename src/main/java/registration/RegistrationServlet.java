@@ -6,6 +6,8 @@ import model.bank.BankAccount;
 import model.bank.Payment;
 import model.bank.User;
 import model.util.Utility;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @WebServlet("/register")
 public class RegistrationServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(RegistrationServlet.class);
     private RegistrationDao registrationDao = new RegistrationDao();
     private LoginDao loginDao = new LoginDao();
 
@@ -41,6 +44,8 @@ public class RegistrationServlet extends HttpServlet {
         user.setUserPassword(userPassword);
 
         try {
+            logger.info("Checking if user already existed in database: " + userLogin);
+
             if (loginDao.validate(loginBean)) {
                 user = loginDao.getUser(loginBean);
                 HttpSession session = req.getSession();
@@ -53,6 +58,8 @@ public class RegistrationServlet extends HttpServlet {
                 RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
                 dispatcher.forward(req, resp);
             } else if (registrationDao.registerUser(user) == 1) {
+                logger.info("Check failed: " + userLogin + "  Attempt to create new.");
+
                 User newUser = registrationDao.getNameAndID(user);
                 String sessionName = newUser.getFirstName();
                 Long userID = newUser.getUserID();
@@ -61,6 +68,9 @@ public class RegistrationServlet extends HttpServlet {
                 session.setAttribute("userID", userID);
                 session.setAttribute("accountsList", new ArrayList<>());
                 session.setAttribute("paymentsList", new ArrayList<>());
+
+                logger.info("New User successfully created: " + userID);
+
                 RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
                 dispatcher.forward(req, resp);
             } else {
@@ -68,7 +78,7 @@ public class RegistrationServlet extends HttpServlet {
                 dispatcher.forward(req, resp);
             }
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception: ", e);
         }
     }
 }

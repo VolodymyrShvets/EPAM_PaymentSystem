@@ -24,7 +24,3 @@ public class SessionLocaleFilter implements Filter {
     public void init(FilterConfig arg0) throws ServletException {
     }
 }
-/*
-<li><a href="<%=request.getContextPath()%>/self-main">ENG</a></li>
-    <li><a href="<%=request.getContextPath()%>/self-main?lang=ua">UA</a></li>
- */

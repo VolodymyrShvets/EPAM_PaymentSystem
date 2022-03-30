@@ -6,11 +6,14 @@ import model.bank.User;
 import model.bank.UserRequest;
 import model.util.SQLConfig;
 import model.util.Utility;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.List;
 
 public class LoginDao {
+    final static Logger logger = LogManager.getLogger(LoginDao.class);
     private final SQLConfig config = new SQLConfig();
 
     public boolean validate(LoginBean loginBean) throws ClassNotFoundException {
@@ -27,11 +30,12 @@ public class LoginDao {
 
             if (rs.next()) {
                 if(Utility.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
+                    logger.info("Successful login validation: " + loginBean.getUsername());
                     status = true;
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception:", e);
         }
         return status;
     }

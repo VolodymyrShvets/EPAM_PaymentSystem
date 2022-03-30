@@ -2,6 +2,8 @@ package mainpageservlets;
 
 import model.bank.BankAccount;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @WebServlet("/fund")
 public class FundServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(FundServlet.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
@@ -39,14 +42,14 @@ public class FundServlet extends HttpServlet {
             moneyAmountUpdate.setDouble(1, account.getCard().getMoneyAmount());
             moneyAmountUpdate.setLong(2, account.getCard().getCardNumber());
 
-            int result = moneyAmountUpdate.executeUpdate();
-            System.out.println("cards updated :  " + result);
+            moneyAmountUpdate.executeUpdate();
 
             List<BankAccount> list = config.getAllUserAccounts(String.valueOf(account.getUserID()));
             session.setAttribute("accountsList", list);
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception:", ex);
         }
+        logger.info(String.format("Account %s successfully funded.", accountID));
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
         dispatcher.forward(req, resp);

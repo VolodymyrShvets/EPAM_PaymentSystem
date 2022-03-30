@@ -2,6 +2,8 @@ package mainpageservlets;
 
 import model.bank.UserRequest;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -18,16 +20,18 @@ import java.sql.SQLException;
 
 @WebServlet("/unblock-user")
 public class UserUnblockingServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(UserUnblockingServlet.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         Long userID = (Long) session.getAttribute("userID");
-        System.out.println(userID);
 
         UserRequest request = new UserRequest();
         request.createUserUnblockingRequest(userID);
+
+        logger.info("Attempt to create new UserRequest.");
 
         try(Connection connection = DriverManager.getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -37,11 +41,12 @@ public class UserUnblockingServlet extends HttpServlet {
             requestStatement.setString(1, request.getType().name());
             requestStatement.setLong(2, request.getUserID());
 
-            int res = requestStatement.executeUpdate();
-            System.out.println("inserted requests : " + res);
+            requestStatement.executeUpdate();
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
+        logger.info("Created new UserRequest for: " + userID);
+
         session.setAttribute("loginResult", "You successfully sent request to Admin.<br>Try another login later.");
         RequestDispatcher dispatcher = req.getRequestDispatcher("index.jsp");
         dispatcher.forward(req, resp);

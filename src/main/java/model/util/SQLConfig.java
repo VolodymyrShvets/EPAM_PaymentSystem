@@ -5,6 +5,8 @@ import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
 import model.enums.RequestType;
 import model.enums.UserRole;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,6 +18,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class SQLConfig {
+    final static Logger logger = LogManager.getLogger(SQLConfig.class);
     private static String url;
     private static String password;
     private static String login;
@@ -63,7 +66,7 @@ public class SQLConfig {
                 account = new BankAccount(rs.getLong("ID"), new CreditCard(rs.getLong("cardNumber"), rs.getInt("cvv2"), date, rs.getDouble("moneyAmount")), AccUsrStatus.valueOf(rs.getString("accountStatus")), rs.getLong("userID"));
             }
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception: ", e);
         }
         return account;
     }
@@ -90,7 +93,7 @@ public class SQLConfig {
                 accounts.add(account);
             }
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception: ", e);
         }
         return accounts;
     }
@@ -118,7 +121,7 @@ public class SQLConfig {
                 payments.add(payment);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
         return payments;
     }
@@ -147,7 +150,7 @@ public class SQLConfig {
                 requests.add(request);
             }
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
         return requests;
     }
@@ -174,10 +177,9 @@ public class SQLConfig {
             System.out.println(statement);
 
             int rs = statement.executeUpdate();
-            System.out.println("requests deleted : " + rs);
 
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
     }
 
@@ -226,7 +228,7 @@ public class SQLConfig {
                     rs.getString("lastName"));
 
         } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception: ", e);
         }
         return user;
     }
@@ -257,7 +259,7 @@ public class SQLConfig {
             }
 
         }catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
 
         return users;

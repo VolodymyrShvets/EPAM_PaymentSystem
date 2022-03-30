@@ -5,6 +5,8 @@ import model.bank.Payment;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @WebServlet("/newPayment")
 public class PaymentServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(PaymentServlet.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
@@ -38,8 +41,11 @@ public class PaymentServlet extends HttpServlet {
         BankAccount sender = config.getAccount(senderId);
         BankAccount recipient = config.getAccount(recipientID);
 
+        logger.info("Attempt to create New Payment.");
+
         if (paymentType == null) {
             session.setAttribute("paymentError", "Payment type should be non-null.");
+            logger.error("Payment Type is NULL");
             RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
             dispatcher.forward(req, resp);
             return;
@@ -47,6 +53,7 @@ public class PaymentServlet extends HttpServlet {
 
         if (sender.getCard().getMoneyAmount() < Double.parseDouble(amount)) {
             session.setAttribute("paymentError", "Not enough money on account.");
+            logger.error("Not Enough Money");
             RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
             dispatcher.forward(req, resp);
             return;
@@ -54,6 +61,7 @@ public class PaymentServlet extends HttpServlet {
 
         if (sender.getCard().getCvv2() != Integer.parseInt(cvv2)) {
             session.setAttribute("paymentError", "Wrong CVV2.");
+            logger.error("Wrong CVV2");
             RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
             dispatcher.forward(req, resp);
             return;
@@ -83,6 +91,7 @@ public class PaymentServlet extends HttpServlet {
 
             if (recipientAccountStatus.equals(AccUsrStatus.BLOCKED.name())) {
                 session.setAttribute("paymentError", "Account you tried to reach is currently blocked.<br>Try again later.");
+                logger.error("Recipient Account is Blocked");
                 RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
                 dispatcher.forward(req, resp);
                 return;
@@ -103,8 +112,7 @@ public class PaymentServlet extends HttpServlet {
             insertNewPaymentStatement.setString(6, payment.getSenderName());
             insertNewPaymentStatement.setString(7, payment.getRecipientName());
 
-            int result = insertNewPaymentStatement.executeUpdate();
-            System.out.println("inserted payments :  " + result);
+            insertNewPaymentStatement.executeUpdate();
 
             sender.withdrawal(Double.parseDouble(amount));
             recipient.funding(Double.parseDouble(amount));
@@ -115,8 +123,7 @@ public class PaymentServlet extends HttpServlet {
             moneyAmountUpdate.setDouble(1, sender.getCard().getMoneyAmount());
             moneyAmountUpdate.setLong(2, sender.getCard().getCardNumber());
 
-            result = moneyAmountUpdate.executeUpdate();
-            System.out.println("cards updated :  " + result);
+            moneyAmountUpdate.executeUpdate();
 
             //----------------------
             if (payment.getStatus().equals(PaymentStatus.SENT)) {
@@ -125,8 +132,7 @@ public class PaymentServlet extends HttpServlet {
                 moneyAmountUpdate.setDouble(1, recipient.getCard().getMoneyAmount());
                 moneyAmountUpdate.setLong(2, recipient.getCard().getCardNumber());
 
-                result = moneyAmountUpdate.executeUpdate();
-                System.out.println("cards updated :  " + result);
+                moneyAmountUpdate.executeUpdate();
             }
             //----------------------
 
@@ -135,8 +141,10 @@ public class PaymentServlet extends HttpServlet {
             List<BankAccount> accounts = config.getAllUserAccounts(String.valueOf(userID));
             session.setAttribute("accountsList", accounts);
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception:", ex);
         }
+
+        logger.info("New Payment successfully created.");
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
         dispatcher.forward(req, resp);

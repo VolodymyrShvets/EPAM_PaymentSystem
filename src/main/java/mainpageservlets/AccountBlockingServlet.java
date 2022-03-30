@@ -2,6 +2,8 @@ package mainpageservlets;
 
 import model.bank.BankAccount;
 import model.util.SQLConfig;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,6 +21,7 @@ import java.util.List;
 
 @WebServlet("/accstatuschanging")
 public class AccountBlockingServlet extends HttpServlet {
+    final static Logger logger = LogManager.getLogger(AccountBlockingServlet.class);
     private final SQLConfig config = new SQLConfig();
 
     @Override
@@ -30,6 +33,8 @@ public class AccountBlockingServlet extends HttpServlet {
         account.block();
         account.printAccountState();
 
+        logger.info("Attempt to Block Account.");
+
         try (Connection connection = DriverManager
                 .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -38,14 +43,15 @@ public class AccountBlockingServlet extends HttpServlet {
             accountStatusUpdate.setString(1, account.getStatus().name());
             accountStatusUpdate.setLong(2, account.getAccountID());
 
-            int result = accountStatusUpdate.executeUpdate();
-            System.out.println("accounts updated :  " + result);
+            accountStatusUpdate.executeUpdate();
 
             List<BankAccount> list = config.getAllUserAccounts(String.valueOf(account.getUserID()));
             session.setAttribute("accountsList", list);
         } catch (SQLException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+            logger.error("Caught Exception: ", ex);
         }
+
+        logger.info(String.format("Account %s successfully blocked.", accountID));
 
         // TODO update all PRG relationships ( sendRedirect -> forward )
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
