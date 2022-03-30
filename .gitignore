@@ -2,6 +2,7 @@
 *.iml
 out
 gen
+logs
 ### Maven template
 target/
 pom.xml.tag
