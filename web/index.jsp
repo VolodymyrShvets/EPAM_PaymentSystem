@@ -38,7 +38,7 @@
         <fmt:message key="label.welcome2"/></h1>
     <p>
     <h2><fmt:message key="label.login1"/></h2></p>
-    <form action="<%= request.getContextPath()%>/login" method="post">
+    <form action="<%= request.getContextPath()%>/login" method="get">
         <table>
             <tr>
                 <td><fmt:message key="label.login"/></td>

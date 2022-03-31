@@ -26,7 +26,7 @@ public class LoginServlet extends HttpServlet {
     private final LoginDao loginDao = new LoginDao();
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String userName = Utility.encode(req.getParameter("username"));
         String password = Utility.encode(req.getParameter("password"));
 
