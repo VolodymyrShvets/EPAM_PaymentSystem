@@ -19,7 +19,7 @@ import java.util.List;
 @WebServlet("/newAccount")
 public class AccountsServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(AccountsServlet.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

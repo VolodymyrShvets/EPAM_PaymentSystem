@@ -5,39 +5,14 @@ import model.bank.Payment;
 import model.bank.User;
 import model.bank.UserRequest;
 import model.util.SQLConfig;
-import model.util.Utility;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
-import java.sql.*;
 import java.util.List;
 
 public class LoginDao {
-    final static Logger logger = LogManager.getLogger(LoginDao.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     public boolean validate(LoginBean loginBean) throws ClassNotFoundException {
-        boolean status = false;
-
-        Class.forName("com.mysql.cj.jdbc.Driver");
-
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            PreparedStatement statement = connection.prepareStatement("select userPassword from Users where userLogin = ? ");
-            statement.setString(1, loginBean.getUsername());
-
-            ResultSet rs = statement.executeQuery();
-
-            if (rs.next()) {
-                if(Utility.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
-                    logger.info("Successful login validation: " + loginBean.getUsername());
-                    status = true;
-                }
-            }
-        } catch (SQLException e) {
-            logger.error("Caught Exception:", e);
-        }
-        return status;
+        return config.validateUserPassword(loginBean);
     }
 
     public List<BankAccount> getUserAccounts(String userID) {

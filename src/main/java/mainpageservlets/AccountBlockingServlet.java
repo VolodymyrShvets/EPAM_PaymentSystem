@@ -22,7 +22,7 @@ import java.util.List;
 @WebServlet("/accstatuschanging")
 public class AccountBlockingServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(AccountBlockingServlet.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

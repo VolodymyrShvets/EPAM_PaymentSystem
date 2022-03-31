@@ -1,5 +1,6 @@
 package model.util;
 
+import login.LoginBean;
 import model.bank.*;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
@@ -19,11 +20,12 @@ import java.util.Properties;
 
 public class SQLConfig {
     final static Logger logger = LogManager.getLogger(SQLConfig.class);
-    private static String url;
-    private static String password;
-    private static String login;
+    private static SQLConfig instance;
+    private final String url;
+    private final String password;
+    private final String login;
 
-    public SQLConfig() {
+    private SQLConfig() {
         Properties properties = new Properties();
         try (InputStream iStream = getClass().getClassLoader().getResourceAsStream("database.properties")) {
             properties.load(iStream);
@@ -33,6 +35,13 @@ public class SQLConfig {
         url = properties.getProperty("connection.url");
         login = properties.getProperty("connection.login");
         password = properties.getProperty("connection.password");
+    }
+
+    public static SQLConfig getInstance() {
+        if (instance == null) {
+            instance = new SQLConfig();
+        }
+        return instance;
     }
 
     public String getUrl() {
@@ -263,6 +272,54 @@ public class SQLConfig {
         }
 
         return users;
+    }
+
+    public boolean validateUserPassword(LoginBean loginBean) throws ClassNotFoundException {
+        boolean status = false;
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        try (Connection connection = DriverManager
+                .getConnection(url, login, password)) {
+            PreparedStatement statement = connection.prepareStatement("select userPassword from Users where userLogin = ? ");
+            statement.setString(1, loginBean.getUsername());
+
+            ResultSet rs = statement.executeQuery();
+
+            if (rs.next()) {
+                if(Utility.validatePassword(loginBean.getPassword(), rs.getString("userPassword"))){
+                    logger.info("Successful login validation: " + loginBean.getUsername());
+                    status = true;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Caught Exception:", e);
+        }
+        return status;
+    }
+
+    public int registerNewUser(User user) throws ClassNotFoundException{
+        String INSERT_USER_SQL = "INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int result = 0;
+
+        Class.forName("com.mysql.cj.jdbc.Driver");
+
+        try(Connection connection = DriverManager
+                .getConnection(url, login, password)) {
+            PreparedStatement statement = connection.prepareStatement(INSERT_USER_SQL);
+            statement.setObject(1, user.getUserID());
+            statement.setString(2, user.getStatus().name());
+            statement.setString(3, user.getUserRole().name());
+            statement.setString(4, user.getFirstName());
+            statement.setString(5, user.getLastName());
+            statement.setString(6, user.getUserLogin());
+            statement.setString(7, user.getUserPassword());
+
+            result = statement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     /*

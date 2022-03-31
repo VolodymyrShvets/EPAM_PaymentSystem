@@ -23,7 +23,7 @@ import java.util.List;
 @WebServlet("/newPayment")
 public class PaymentServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(PaymentServlet.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

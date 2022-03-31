@@ -21,7 +21,7 @@ import java.sql.SQLException;
 @WebServlet("/unblock-user")
 public class UserUnblockingServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(UserUnblockingServlet.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -24,7 +24,7 @@ import java.util.List;
 @WebServlet("/change-account-status")
 public class ChangeAccountStatus extends HttpServlet {
     final static Logger logger = LogManager.getLogger(ChangeAccountStatus.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

@@ -23,7 +23,7 @@ import java.util.List;
 @WebServlet("/change-user-status")
 public class ChangeUserStatus extends HttpServlet {
     final static Logger logger = LogManager.getLogger(ChangeUserStatus.class);
-    private final SQLConfig config = new SQLConfig();
+    private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
