@@ -48,8 +48,6 @@ public class ChangeAccountStatus extends HttpServlet {
                 userStatusUpdate.setLong(2, account.getAccountID());
 
                 int result = userStatusUpdate.executeUpdate();
-                System.out.println("accounts updated : " + result + " : " + account.getAccountID());
-                System.out.println("new status : " + account.getStatus());
 
                 if (!operation && result == 1) {
                     config.deleteAllRequests(accountID, RequestType.ACCOUNT);
