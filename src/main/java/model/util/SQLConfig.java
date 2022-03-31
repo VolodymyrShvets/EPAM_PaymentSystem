@@ -1,6 +1,6 @@
 package model.util;
 
-import login.LoginBean;
+import controller.login.LoginBean;
 import model.bank.*;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
