@@ -26,7 +26,7 @@
     <h3><fmt:message key="label.accBlockPage1"/> <%=request.getParameter("id")%><br><fmt:message
             key="label.accBlockPage2"/>
         <br><fmt:message key="label.accBlockPage3"/></h3></p>
-    <form action="<%= request.getContextPath()%>/accstatuschanging" method="post">
+    <form action="<%= request.getContextPath()%>/accstatuschanging" method="get">
         <%
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));

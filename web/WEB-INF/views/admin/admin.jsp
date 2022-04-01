@@ -92,14 +92,14 @@
         <%if (req.getType() == RequestType.ACCOUNT) {%>
         <td id="unblocked">
             <form action="<%=request.getContextPath()%>/change-account-status?id=<%=req.getAccountID()%>&amp;operation=<%=false%>"
-                  method="post">
+                  method="get">
                 <button type="submit"><fmt:message key="label.reqUnblockAcc"/></button>
             </form>
         </td>
         <%} else {%>
         <td id="unblocked">
             <form action="<%=request.getContextPath()%>/change-user-status?id=<%=req.getUserID()%>&amp;operation=<%=false%>"
-                  method="post">
+                  method="get">
                 <button type="submit"><fmt:message key="label.reqUnblockUser"/></button>
             </form>
         </td>

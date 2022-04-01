@@ -139,7 +139,7 @@
     %>
 </table>
 
-<form action="<%= request.getContextPath()%>/newAccount" method="post">
+<form action="<%= request.getContextPath()%>/newAccount" method="get">
     <p><input type="submit" value="<fmt:message key="label.newAccount" />"></p>
 </form>
 
@@ -198,7 +198,7 @@
         }
     %>
 </table>
-<form action="<%= request.getContextPath()%>/payment-page" method="post">
+<form action="<%= request.getContextPath()%>/payment-page" method="get">
     <p><input type="submit" value="<fmt:message key="label.newPayment" />"></p>
 </form>
 

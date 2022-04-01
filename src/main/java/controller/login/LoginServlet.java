@@ -20,7 +20,7 @@ import java.util.List;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
-@WebServlet("/controller")
+@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(LoginServlet.class);
     private final LoginDao loginDao = new LoginDao();

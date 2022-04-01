@@ -32,7 +32,7 @@
     <p>
     <h2><fmt:message key="label.fundingPageH2"/></h2>
     <h3><fmt:message key="label.fundingPage1"/><br><fmt:message key="label.fundingPage2"/></h3></p>
-    <form action="<%= request.getContextPath()%>/fund" method="post">
+    <form action="<%= request.getContextPath()%>/fund" method="get">
         <%
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));

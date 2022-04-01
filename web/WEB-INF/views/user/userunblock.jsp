@@ -26,7 +26,7 @@
     <h3><fmt:message key="label.userUnblockPage1"/><br><fmt:message key="label.accUnblockPage2"/><br><fmt:message
             key="label.accUnblockPage3"/></h3>
     </p>
-    <form action="<%=request.getContextPath()%>/unblock-user" method="post">
+    <form action="<%=request.getContextPath()%>/unblock-user" method="get">
         <h3><%=session.getAttribute("userID")%>
         </h3>
         <p>

@@ -182,10 +182,7 @@ public class SQLConfig {
             statement.setString(1, type.name());
             statement.setString(2, ID);
 
-            System.out.println(DELETE_QUERY);
-            System.out.println(statement);
-
-            int rs = statement.executeUpdate();
+            statement.executeUpdate();
 
         } catch (SQLException | ClassNotFoundException ex) {
             logger.error("Caught Exception: ", ex);

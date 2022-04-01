@@ -36,7 +36,7 @@
     <h2><fmt:message key="label.paymentPageH2"/></h2>
     <h3><fmt:message key="label.paymentPage1"/><br><fmt:message key="label.paymentPage2"/><br><fmt:message
             key="label.paymentPage3"/></h3></p>
-    <form action="<%=request.getContextPath()%>/newPayment" method="post">
+    <form action="<%=request.getContextPath()%>/newPayment" method="get">
         <%
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));
