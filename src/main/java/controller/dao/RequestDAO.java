@@ -22,7 +22,7 @@ public class RequestDAO {
         UserRequest request = new UserRequest();
         request.createUserUnblockingRequest(userID);
 
-        try(Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID) VALUES (?, ?)";
             PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
             requestStatement.setString(1, request.getType().name());
@@ -74,7 +74,7 @@ public class RequestDAO {
 
         DELETE_QUERY.append(" = ?");
 
-        try(Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             PreparedStatement statement = connection.prepareStatement(DELETE_QUERY.toString());
             statement.setString(1, type.name());
             statement.setString(2, ID);

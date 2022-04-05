@@ -9,6 +9,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class PaymentDAO {
     }
 
     public List<Payment> getPayments() {
-        updatePaymentStatuses();
+        updatePaymentStatuses(payments);
         return payments;
     }
 
@@ -93,7 +94,6 @@ public class PaymentDAO {
             insertNewPaymentStatement.executeUpdate();
 
             sender.withdrawal(Double.parseDouble(amount));
-            recipient.funding(Double.parseDouble(amount));
 
             //----------------------
             PreparedStatement moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
@@ -103,22 +103,11 @@ public class PaymentDAO {
 
             moneyAmountUpdate.executeUpdate();
 
-            //----------------------
-            if (payment.getStatus().equals(PaymentStatus.SENT)) {
-                moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
-
-                moneyAmountUpdate.setDouble(1, recipient.getCard().getMoneyAmount());
-                moneyAmountUpdate.setLong(2, recipient.getCard().getCardNumber());
-
-                moneyAmountUpdate.executeUpdate();
-            }
-            //----------------------
-
             UserDAO userDAO = new UserDAO();
-            payments = userDAO.getAllUserPayments(String.valueOf(userID));
+            payments = getAllUserPayments(String.valueOf(userID));
             accounts = userDAO.getAllUserAccounts(String.valueOf(userID));
 
-
+            updatePaymentStatuses(payments);
         } catch (SQLException | ClassNotFoundException ex) {
             logger.error("Caught Exception:", ex);
             return "Something wrong happens.";
@@ -128,30 +117,92 @@ public class PaymentDAO {
         return "";
     }
 
-    private void updatePaymentStatuses() {
+    public List<Payment> getAllUserPayments(String userID) {
+        AccountDAO dao = new AccountDAO();
+        List<Payment> payments = new ArrayList<>();
+        List<BankAccount> accounts = new UserDAO().getAllUserAccounts(userID);
+
+        String SQL_GET_USER_PAYMENTS_QUERY = "SELECT * FROM Payment WHERE recipientAccID IN (";
+
+        String newQuery = createQuery(SQL_GET_USER_PAYMENTS_QUERY, accounts);
+
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(newQuery);
+
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                LocalDate date = LocalDate.parse(new SimpleDateFormat("yyy-MM-dd").format(rs.getDate("paymentDate")));
+                BankAccount recipient = dao.getAccount(rs.getString("recipientAccID"));
+                BankAccount sender = dao.getAccount(rs.getString("senderAccID"));
+                Payment payment = new Payment(rs.getLong("ID"), PaymentStatus.valueOf(rs.getString("paymentStatus")), date, recipient, rs.getString("recipientName"), sender, rs.getString("senderName"), rs.getDouble("paymentSum"));
+                payments.add(payment);
+            }
+            updatePaymentStatuses(payments);
+        } catch (SQLException ex) {
+            logger.error("Caught Exception: ", ex);
+        }
+        return payments;
+    }
+
+    private String createQuery(String SQL_GET_USER_PAYMENTS_QUERY, List<BankAccount> accounts) {
+        if (accounts.size() == 0) {
+            return (SQL_GET_USER_PAYMENTS_QUERY += "1) OR senderAccID IN (1)");
+        }
+
+        for (BankAccount account : accounts) {
+            SQL_GET_USER_PAYMENTS_QUERY += account.getAccountID();
+            SQL_GET_USER_PAYMENTS_QUERY += ",";
+        }
+
+        if (SQL_GET_USER_PAYMENTS_QUERY.endsWith(",")) {
+            SQL_GET_USER_PAYMENTS_QUERY = SQL_GET_USER_PAYMENTS_QUERY.substring(0, SQL_GET_USER_PAYMENTS_QUERY.length() - 1);
+            SQL_GET_USER_PAYMENTS_QUERY += ") OR senderAccID IN (";
+        }
+
+        for (BankAccount account : accounts) {
+            SQL_GET_USER_PAYMENTS_QUERY += account.getAccountID();
+            SQL_GET_USER_PAYMENTS_QUERY += ",";
+        }
+
+        if (SQL_GET_USER_PAYMENTS_QUERY.endsWith(",")) {
+            SQL_GET_USER_PAYMENTS_QUERY = SQL_GET_USER_PAYMENTS_QUERY.substring(0, SQL_GET_USER_PAYMENTS_QUERY.length() - 1);
+            SQL_GET_USER_PAYMENTS_QUERY += ")";
+        }
+        return SQL_GET_USER_PAYMENTS_QUERY;
+    }
+
+    private void updatePaymentStatuses(List<Payment> payments) {
         List<Payment> paymentsForUpdate = new ArrayList<>();
-        for (Payment payment: payments) {
+        for (Payment payment : payments) {
             if (payment.getStatus().equals(PaymentStatus.PREPARED))
                 if (payment.getPaymentDate().compareTo(LocalDate.now()) <= 0)
                     paymentsForUpdate.add(payment);
         }
 
-        try (Connection con = C3P0DataSource.getInstance().getConnection()){
-            Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection con = C3P0DataSource.getInstance().getConnection()) {
             String updateStatement1 = "UPDATE Payment SET paymentStatus = ? WHERE recipientAccID = ? OR senderAccID = ?";
             String updateStatement2 = "UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?";
 
-            for (Payment payment: paymentsForUpdate) {
+            for (Payment payment : paymentsForUpdate) {
                 payment.updateStatus();
                 PreparedStatement statement1 = con.prepareStatement(updateStatement1);
 
                 statement1.setString(1, payment.getStatus().name());
-                //statement1.setLong(2, );
+                statement1.setLong(2, payment.getRecipient());
+                statement1.setLong(3, payment.getSender());
+
+                BankAccount recipient = new AccountDAO().getAccount(String.valueOf(payment.getRecipient()));
+                recipient.funding(payment.getPaymentSum());
 
                 PreparedStatement statement2 = con.prepareStatement(updateStatement2);
+                statement2.setDouble(1, recipient.getCard().getMoneyAmount());
+                statement2.setLong(2, recipient.getCard().getCardNumber());
+
+                statement2.executeUpdate();
             }
 
-        } catch (SQLException | ClassNotFoundException ex) {
+            paymentsForUpdate.clear();
+        } catch (SQLException ex) {
             logger.error("Caught Exception:", ex);
         }
     }

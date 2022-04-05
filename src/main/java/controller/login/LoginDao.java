@@ -1,5 +1,6 @@
 package controller.login;
 
+import controller.dao.PaymentDAO;
 import controller.dao.RequestDAO;
 import controller.dao.UserDAO;
 import model.bank.BankAccount;
@@ -25,7 +26,7 @@ public class LoginDao {
     }
 
     public List<Payment> getUserPayments(String userID) {
-        return userDAO.getAllUserPayments(userID);
+        return new PaymentDAO().getAllUserPayments(userID);
     }
 
     public List<UserRequest> getAdminRequests() {
