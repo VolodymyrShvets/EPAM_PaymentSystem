@@ -1,26 +1,50 @@
 package controller.dao;
 
 import model.bank.BankAccount;
+import model.bank.CreditCard;
 import model.bank.User;
 import model.bank.UserRequest;
+import model.enums.AccUsrStatus;
 import model.enums.RequestType;
-import model.util.SQLConfig;
+import model.util.C3P0DataSource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.List;
 
 public class AccountDAO {
     final static Logger logger = LogManager.getLogger(AccountDAO.class);
-    private SQLConfig config;
 
-    public AccountDAO(SQLConfig config) {
-        this.config = config;
+    public AccountDAO() {
+    }
+
+    public BankAccount getAccount(String accountID) {
+        BankAccount account = null;
+        String SQL_GET_USER_ACCOUNTS_QUERY = "SELECT BC.ID, BC.userID, BC.accountStatus,\n" +
+                "\tCC.cardNumber, CC.cvv2, CC.expirationDate, CC.moneyAmount\n" +
+                "    FROM BankAccount AS BC LEFT JOIN CreditCard AS CC ON BC.card = CC.cardNumber\n" +
+                "    WHERE BC.ID = ?";
+
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_ACCOUNTS_QUERY);
+            statement.setInt(1, Integer.parseInt(accountID));
+
+            ResultSet rs = statement.executeQuery();
+            while (rs.next()) {
+                LocalDate date = LocalDate.parse(new SimpleDateFormat("yyy-MM-dd").format(rs.getDate("expirationDate")));
+                account = new BankAccount(rs.getLong("ID"), new CreditCard(rs.getLong("cardNumber"), rs.getInt("cvv2"), date, rs.getDouble("moneyAmount")), AccUsrStatus.valueOf(rs.getString("accountStatus")), rs.getLong("userID"));
+            }
+        } catch (SQLException e) {
+            logger.error("Caught Exception: ", e);
+        }
+        return account;
     }
 
     public List<BankAccount> blockAccount(String accountID) {
-        BankAccount account = config.getAccount(accountID);
+        BankAccount account = getAccount(accountID);
         List<BankAccount> list = null;
 
         account.block();
@@ -28,9 +52,7 @@ public class AccountDAO {
 
         logger.info("Attempt to Block Account.");
 
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             PreparedStatement accountStatusUpdate = connection.prepareStatement("UPDATE BankAccount SET accountStatus = ? WHERE ID = ?");
 
             accountStatusUpdate.setString(1, account.getStatus().name());
@@ -38,8 +60,9 @@ public class AccountDAO {
 
             accountStatusUpdate.executeUpdate();
 
-            list = config.getAllUserAccounts(String.valueOf(account.getUserID()));
-        } catch (SQLException | ClassNotFoundException ex) {
+            UserDAO userDAO = new UserDAO();
+            list = userDAO.getAllUserAccounts(String.valueOf(account.getUserID()));
+        } catch (SQLException ex) {
             logger.error("Caught Exception: ", ex);
         }
 
@@ -50,16 +73,14 @@ public class AccountDAO {
 
     public List<User> changeAccountStatus(String accountID, boolean operation) {
         List<User> list = null;
-        BankAccount account = config.getAccount(accountID);
+        BankAccount account = getAccount(accountID);
 
         if (operation)
             account.block();
         else
             account.unblock();
 
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             PreparedStatement userStatusUpdate = connection.prepareStatement("UPDATE BankAccount SET accountStatus = ? WHERE ID = ?");
 
             userStatusUpdate.setString(1, account.getStatus().name());
@@ -68,13 +89,13 @@ public class AccountDAO {
             int result = userStatusUpdate.executeUpdate();
 
             if (!operation && result == 1) {
-                config.deleteAllRequests(accountID, RequestType.ACCOUNT);
+                new RequestDAO().deleteAllRequests(accountID, RequestType.ACCOUNT);
             }
 
             logger.info(String.format("Updated BankAccount status: for ID=%s STATUS=%s", account.getAccountID(), account.getStatus()));
 
-            list = config.getAllUsers();
-        } catch (SQLException | ClassNotFoundException ex) {
+            list = new UserDAO().getAllUsers();
+        } catch (SQLException ex) {
             logger.error("Caught Exception:", ex);
         }
 
@@ -87,9 +108,7 @@ public class AccountDAO {
 
         logger.info("Attempt to create new AccountRequest.");
 
-        try (Connection connection = DriverManager.getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID, accountID) VALUES (?, ?, ?)";
             PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
             requestStatement.setString(1, request.getType().name());
@@ -97,7 +116,7 @@ public class AccountDAO {
             requestStatement.setLong(3, request.getAccountID());
 
             requestStatement.executeUpdate();
-        } catch (SQLException | ClassNotFoundException ex) {
+        } catch (SQLException ex) {
             logger.error("Caught Exception: ", ex);
         }
         logger.info("Created new AccountRequest for UserID=" + userID + " and AccountID=" + accountID);
@@ -113,9 +132,7 @@ public class AccountDAO {
 
         logger.info("Attempt to create New Account with ID=" + newAccount.getAccountID());
 
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             PreparedStatement accountStatement = connection.prepareStatement(INSERT_BANK_ACCOUNT_SQL);
             PreparedStatement cardStatement = connection.prepareStatement(INSERT_CARD_SQL);
 
@@ -133,8 +150,8 @@ public class AccountDAO {
 
             accountStatement.executeUpdate();
 
-            accounts = config.getAllUserAccounts(String.valueOf(userID));
-        } catch (SQLException | ClassNotFoundException e) {
+            accounts = new UserDAO().getAllUserAccounts(String.valueOf(userID));
+        } catch (SQLException e) {
             logger.error("Caught Exception:", e);
         }
 
@@ -145,14 +162,12 @@ public class AccountDAO {
 
     public List<BankAccount> fundAccount(double fundSum, String accountID) {
         List<BankAccount> list = null;
-        BankAccount account = config.getAccount(accountID);
+        BankAccount account = getAccount(accountID);
 
         //account.printAccountState();
         account.funding(fundSum);
 
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             PreparedStatement moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
 
             moneyAmountUpdate.setDouble(1, account.getCard().getMoneyAmount());
@@ -160,8 +175,8 @@ public class AccountDAO {
 
             moneyAmountUpdate.executeUpdate();
 
-            list = config.getAllUserAccounts(String.valueOf(account.getUserID()));
-        } catch (SQLException | ClassNotFoundException ex) {
+            list = new UserDAO().getAllUserAccounts(String.valueOf(account.getUserID()));
+        } catch (SQLException ex) {
             logger.error("Caught Exception:", ex);
         }
         logger.info(String.format("Account %s successfully funded.", accountID));

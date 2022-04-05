@@ -2,9 +2,6 @@ package controller.mainpageservlets;
 
 import controller.dao.AccountDAO;
 import model.bank.BankAccount;
-import model.util.SQLConfig;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -18,14 +15,12 @@ import java.util.List;
 
 @WebServlet("/newAccount")
 public class AccountsServlet extends HttpServlet {
-    private final SQLConfig config = SQLConfig.getInstance();
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         long userID = (long) session.getAttribute("userID");
 
-        AccountDAO dao = new AccountDAO(config);
+        AccountDAO dao = new AccountDAO();
         List<BankAccount> accounts = dao.createNewAccount(userID);
 
         session.setAttribute("accountsList", accounts);

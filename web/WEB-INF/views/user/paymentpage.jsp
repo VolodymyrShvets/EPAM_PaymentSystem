@@ -41,14 +41,6 @@
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));
         %>
-        <p>
-            <input type="radio" id="sentPayment"
-                   name="paymentType" value="SENT" required>
-            <label for="sentPayment"><fmt:message key="label.paymentSent"/></label>
-            <input type="radio" id="preparedPayment"
-                   name="paymentType" value="PREPARED">
-            <label for="preparedPayment"><fmt:message key="label.paymentPrepared"/></label>
-        </p>
         <table>
             <tr>
                 <td>
@@ -91,7 +83,7 @@
                     <fmt:message key="label.paymentDate"/>
                 </td>
                 <td>
-                    <input id="payDate" type="date" name="paymentDate" value="<%=LocalDate.now()%>" min="<%=LocalDate.now()%>">
+                    <input id="payDate" type="date" name="paymentDate" value="<%=LocalDate.now()%>" min="<%=LocalDate.now()%>" required>
                 </td>
             </tr>
             <tr>

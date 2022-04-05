@@ -1,8 +1,8 @@
 package controller.admin;
 
 import controller.dao.AccountDAO;
+import controller.dao.RequestDAO;
 import model.bank.User;
-import model.util.SQLConfig;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,19 +16,19 @@ import java.util.List;
 
 @WebServlet("/change-account-status")
 public class ChangeAccountStatus extends HttpServlet {
-    private final SQLConfig config = SQLConfig.getInstance();
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String accountID = req.getParameter("id");
         boolean operation = Boolean.parseBoolean(req.getParameter("operation"));   // true: block, false: unblock
 
-        AccountDAO dao = new AccountDAO(config);
+        AccountDAO dao = new AccountDAO();
         List<User> list =  dao.changeAccountStatus(accountID, operation);
 
         session.setAttribute("users", list);
-        session.setAttribute("requests", config.getAllRequests());
+
+        RequestDAO requestDAO = new RequestDAO();
+        session.setAttribute("requests", requestDAO.getAllRequests());
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/admin/admin.jsp");
         dispatcher.forward(req, resp);

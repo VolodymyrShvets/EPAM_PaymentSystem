@@ -1,21 +1,16 @@
 package controller.registration;
 
+import controller.dao.UserDAO;
 import model.bank.User;
-import model.util.SQLConfig;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 public class RegistrationDao {
-    private final SQLConfig config = SQLConfig.getInstance();
+    private final UserDAO userDAO = new UserDAO();
 
     public int registerUser(User user) throws ClassNotFoundException{
-        return config.registerNewUser(user);
+        return userDAO.registerNewUser(user);
     }
 
     public User getNameAndID(User user) {
-        return config.getUser(user.getUserLogin());
+        return userDAO.getUser(user.getUserLogin());
     }
 }

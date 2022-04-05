@@ -1,37 +1,39 @@
 package controller.login;
 
+import controller.dao.RequestDAO;
+import controller.dao.UserDAO;
 import model.bank.BankAccount;
 import model.bank.Payment;
 import model.bank.User;
 import model.bank.UserRequest;
-import model.util.SQLConfig;
 
 import java.util.List;
 
 public class LoginDao {
-    private final SQLConfig config = SQLConfig.getInstance();
+    private final UserDAO userDAO = new UserDAO();
 
     public boolean validate(LoginBean loginBean) throws ClassNotFoundException {
-        return config.validateUserPassword(loginBean);
+        return userDAO.validateUserPassword(loginBean);
     }
 
     public List<BankAccount> getUserAccounts(String userID) {
-        return config.getAllUserAccounts(userID);
+        return userDAO.getAllUserAccounts(userID);
     }
 
     public User getUser(LoginBean loginBean) {
-        return config.getUser(loginBean.getUsername());
+        return userDAO.getUser(loginBean.getUsername());
     }
 
     public List<Payment> getUserPayments(String userID) {
-        return config.getAllUserPayments(userID);
+        return userDAO.getAllUserPayments(userID);
     }
 
     public List<UserRequest> getAdminRequests() {
-        return config.getAllRequests();
+        RequestDAO requestDAO = new RequestDAO();
+        return requestDAO.getAllRequests();
     }
 
     public List<User> getUsersForAdmin() {
-        return config.getAllUsers();
+        return userDAO.getAllUsers();
     }
 }

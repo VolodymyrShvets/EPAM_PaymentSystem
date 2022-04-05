@@ -4,25 +4,25 @@ import model.bank.BankAccount;
 import model.bank.Payment;
 import model.enums.AccUsrStatus;
 import model.enums.PaymentStatus;
-import model.util.SQLConfig;
+import model.util.C3P0DataSource;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class PaymentDAO {
     final static Logger logger = LogManager.getLogger(PaymentDAO.class);
-    private SQLConfig config;
     private List<Payment> payments = null;
     private List<BankAccount> accounts = null;
 
-    public PaymentDAO(SQLConfig config) {
-        this.config = config;
+    public PaymentDAO() {
     }
 
     public List<Payment> getPayments() {
+        updatePaymentStatuses();
         return payments;
     }
 
@@ -30,17 +30,13 @@ public class PaymentDAO {
         return accounts;
     }
 
-    public String createNewPayment(long userID, String paymentType, String senderId,
+    public String createNewPayment(long userID, String senderId,
                                    String recipientID, String amount, String paymentDate, String cvv2) {
-        BankAccount sender = config.getAccount(senderId);
-        BankAccount recipient = config.getAccount(recipientID);
+        AccountDAO accountDAO = new AccountDAO();
+        BankAccount sender = accountDAO.getAccount(senderId);
+        BankAccount recipient = accountDAO.getAccount(recipientID);
 
         logger.info("Attempt to create New Payment.");
-
-        if (paymentType == null) {
-            logger.error("Payment Type is NULL");
-            return "Payment type should be non-null.";
-        }
 
         if (sender.getCard().getMoneyAmount() < Double.parseDouble(amount)) {
             logger.error("Not Enough Money");
@@ -52,8 +48,7 @@ public class PaymentDAO {
             return "Wrong CVV2.";
         }
 
-        try (Connection connection = DriverManager
-                .getConnection(config.getUrl(), config.getLogin(), config.getPassword())) {
+        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
             Class.forName("com.mysql.cj.jdbc.Driver");
 
             String SQL_GET_SENDER_NAME_QUERY = "SELECT firstName, lastName FROM Users WHERE ID = ?";
@@ -79,11 +74,12 @@ public class PaymentDAO {
                 return "Account you tried to reach is currently blocked.<br>Try again later.";
             }
 
-            Payment payment;
-            if (paymentType.equalsIgnoreCase(PaymentStatus.SENT.name()))
-                payment = new Payment(PaymentStatus.SENT, recipient, recipientName, sender, senderName, Double.parseDouble(amount));
-            else
-                payment = new Payment(PaymentStatus.PREPARED, LocalDate.parse(paymentDate), recipient, recipientName, sender, senderName, Double.parseDouble(amount));
+            Payment payment = new Payment(recipient, LocalDate.parse(paymentDate), recipientName, sender, senderName, Double.parseDouble(amount));
+
+            //if (paymentType.equalsIgnoreCase(PaymentStatus.SENT.name()))
+            //    payment = new Payment(PaymentStatus.SENT, recipient, recipientName, sender, senderName, Double.parseDouble(amount));
+            //else
+            //    payment = new Payment(PaymentStatus.PREPARED, LocalDate.parse(paymentDate), recipient, recipientName, sender, senderName, Double.parseDouble(amount));
 
             PreparedStatement insertNewPaymentStatement = connection.prepareStatement(SQL_INSERT_NEW_PAYMENT_QUERY);
             insertNewPaymentStatement.setString(1, payment.getStatus().name());
@@ -118,8 +114,11 @@ public class PaymentDAO {
             }
             //----------------------
 
-            payments = config.getAllUserPayments(String.valueOf(userID));
-            accounts = config.getAllUserAccounts(String.valueOf(userID));
+            UserDAO userDAO = new UserDAO();
+            payments = userDAO.getAllUserPayments(String.valueOf(userID));
+            accounts = userDAO.getAllUserAccounts(String.valueOf(userID));
+
+
         } catch (SQLException | ClassNotFoundException ex) {
             logger.error("Caught Exception:", ex);
             return "Something wrong happens.";
@@ -127,5 +126,33 @@ public class PaymentDAO {
 
         logger.info("New Payment successfully created.");
         return "";
+    }
+
+    private void updatePaymentStatuses() {
+        List<Payment> paymentsForUpdate = new ArrayList<>();
+        for (Payment payment: payments) {
+            if (payment.getStatus().equals(PaymentStatus.PREPARED))
+                if (payment.getPaymentDate().compareTo(LocalDate.now()) <= 0)
+                    paymentsForUpdate.add(payment);
+        }
+
+        try (Connection con = C3P0DataSource.getInstance().getConnection()){
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            String updateStatement1 = "UPDATE Payment SET paymentStatus = ? WHERE recipientAccID = ? OR senderAccID = ?";
+            String updateStatement2 = "UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?";
+
+            for (Payment payment: paymentsForUpdate) {
+                payment.updateStatus();
+                PreparedStatement statement1 = con.prepareStatement(updateStatement1);
+
+                statement1.setString(1, payment.getStatus().name());
+                //statement1.setLong(2, );
+
+                PreparedStatement statement2 = con.prepareStatement(updateStatement2);
+            }
+
+        } catch (SQLException | ClassNotFoundException ex) {
+            logger.error("Caught Exception:", ex);
+        }
     }
 }

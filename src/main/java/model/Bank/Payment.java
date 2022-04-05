@@ -14,9 +14,9 @@ public class Payment {
     private String senderName;
     private double paymentSum;
 
-    public Payment(PaymentStatus status, BankAccount recipient, String recipientName, BankAccount sender, String senderName, double paymentSum) {
-        this.status = status;
-        paymentDate = LocalDate.now();
+    public Payment(BankAccount recipient, LocalDate paymentDate, String recipientName, BankAccount sender, String senderName, double paymentSum) {
+        status = PaymentStatus.PREPARED;
+        this.paymentDate = paymentDate;
         this.recipient = recipient;
         this.recipientName = recipientName;
         this.sender = sender;
@@ -51,6 +51,10 @@ public class Payment {
 
     public PaymentStatus getStatus() {
         return status;
+    }
+
+    public void updateStatus() {
+        status = PaymentStatus.SENT;
     }
 
     public LocalDate getPaymentDate() {

@@ -1,7 +1,6 @@
 package controller.mainpageservlets;
 
 import controller.dao.RequestDAO;
-import model.util.SQLConfig;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -14,14 +13,12 @@ import java.io.IOException;
 
 @WebServlet("/unblock-user")
 public class UserUnblockingServlet extends HttpServlet {
-    private final SQLConfig config = SQLConfig.getInstance();
-
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         Long userID = (Long) session.getAttribute("userID");
 
-        RequestDAO dao = new RequestDAO(config);
+        RequestDAO dao = new RequestDAO();
         String result = dao.createNewRequest(userID);
         session.setAttribute("loginResult", result);
 
