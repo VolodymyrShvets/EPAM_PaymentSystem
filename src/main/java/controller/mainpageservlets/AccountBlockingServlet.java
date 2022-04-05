@@ -17,7 +17,7 @@ public class AccountBlockingServlet extends HttpServlet {
     private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         String accountID = (String) session.getAttribute("accountID");
 

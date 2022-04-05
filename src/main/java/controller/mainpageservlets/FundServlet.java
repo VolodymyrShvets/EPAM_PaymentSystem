@@ -25,7 +25,7 @@ public class FundServlet extends HttpServlet {
     private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         double fundSum = Double.parseDouble(req.getParameter("amount"));
         HttpSession session = req.getSession();
         String accountID = (String) session.getAttribute("accountID");

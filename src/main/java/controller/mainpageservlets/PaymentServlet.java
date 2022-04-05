@@ -20,7 +20,7 @@ public class PaymentServlet extends HttpServlet {
     private final SQLConfig config = SQLConfig.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
         long userID = (long) session.getAttribute("userID");
         String paymentType = req.getParameter("paymentType");

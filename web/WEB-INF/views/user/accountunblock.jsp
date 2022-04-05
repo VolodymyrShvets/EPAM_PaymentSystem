@@ -28,7 +28,7 @@
     <h3><fmt:message key="label.accUnblockPage1"/><br><fmt:message key="label.accUnblockPage2"/>
         <br><fmt:message key="label.accUnblockPage3"/></h3>
     </p>
-    <form action="<%=request.getContextPath()%>/unblock" method="get">
+    <form action="<%=request.getContextPath()%>/unblock" method="post">
         <%
             HttpSession session1 = request.getSession();
             session1.setAttribute("accountID", request.getParameter("id"));
