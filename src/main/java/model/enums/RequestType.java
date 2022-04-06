@@ -1,5 +1,19 @@
 package model.enums;
 
+/**
+ * Enum that represents Request types.
+ */
 public enum RequestType {
-    USER, ACCOUNT
+
+    /**
+     * User Unblocking Request
+     * see also {@see model.bank.UserRequest}
+     */
+    USER,
+
+    /**
+     * Account Unblocking Request
+     * see also {@see model.bank.UserRequest}
+     */
+    ACCOUNT
 }

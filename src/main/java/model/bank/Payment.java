@@ -4,6 +4,9 @@ import model.enums.PaymentStatus;
 
 import java.time.LocalDate;
 
+/**
+ * Class that represents Payment entity in system.
+ */
 public class Payment {
     private long paymentID = -1;
     private PaymentStatus status;
@@ -14,6 +17,17 @@ public class Payment {
     private String senderName;
     private double paymentSum;
 
+    /**
+     * Default constructor that creates payment with Prepared status.
+     * See also {@see model.enums.PaymentStatus}
+     *
+     * @param recipient     recipient account {@see model.bank.BankAccount}
+     * @param paymentDate   payment date
+     * @param recipientName recipient full name
+     * @param sender        sender account {@see model.bank.BankAccount}
+     * @param senderName    sender full name
+     * @param paymentSum    payment sum
+     */
     public Payment(BankAccount recipient, LocalDate paymentDate, String recipientName, BankAccount sender, String senderName, double paymentSum) {
         status = PaymentStatus.PREPARED;
         this.paymentDate = paymentDate;
@@ -24,6 +38,19 @@ public class Payment {
         this.paymentSum = paymentSum;
     }
 
+    /**
+     * Another constructor for Payment.
+     * Used to create new Payment with specific status.
+     * See also {@see model.enums.PaymentStatus}
+     *
+     * @param status        payment status {@see model.enums.PaymentStatus}
+     * @param recipient     account {@see model.bank.BankAccount}
+     * @param paymentDate   payment date
+     * @param recipientName recipient full name
+     * @param sender        sender account {@see model.bank.BankAccount}
+     * @param senderName    sender full name
+     * @param paymentSum    payment sum
+     */
     public Payment(PaymentStatus status, LocalDate paymentDate, BankAccount recipient, String recipientName, BankAccount sender, String senderName, double paymentSum) {
         this.status = status;
         this.paymentDate = paymentDate;
@@ -34,6 +61,19 @@ public class Payment {
         this.paymentSum = paymentSum;
     }
 
+    /**
+     * Yet another Payment constructor.
+     * User to represent payment received from Database.
+     *
+     * @param paymentID     payment ID (created via database)
+     * @param status        payment status {@see model.enums.PaymentStatus}
+     * @param recipient     account {@see model.bank.BankAccount}
+     * @param paymentDate   payment date
+     * @param recipientName recipient full name
+     * @param sender        sender account {@see model.bank.BankAccount}
+     * @param senderName    sender full name
+     * @param paymentSum    payment sum
+     */
     public Payment(long paymentID, PaymentStatus status, LocalDate paymentDate, BankAccount recipient, String recipientName, BankAccount sender, String senderName, double paymentSum) {
         this.paymentID = paymentID;
         this.status = status;

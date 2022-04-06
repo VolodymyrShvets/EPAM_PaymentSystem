@@ -5,19 +5,24 @@ import model.util.Utility;
 
 import java.time.LocalDate;
 
-// Рахунок
+/**
+ * Class that represents Bank Account entity in system.
+ */
 public class BankAccount {
     private final long accountID;
     private final CreditCard card;
     private AccUsrStatus status;
     private long userID;
 
-    public BankAccount(CreditCard card) {
+    /*public BankAccount(CreditCard card) {
         this.card = card;
         this.status = AccUsrStatus.ACTIVE;
         accountID = Utility.createRandomNumber(9);
-    }
+    }*/
 
+    /**
+     * Constructor used to create new Active Account with new CreditCard.
+     */
     public BankAccount() {
         accountID = Utility.createRandomNumber(9);
         card = new CreditCard(
@@ -29,6 +34,15 @@ public class BankAccount {
         status = AccUsrStatus.ACTIVE;
     }
 
+    /**
+     * Constructor used to represent existed Bank Account
+     * received from Database.
+     *
+     * @param accountID Account ID
+     * @param card      CreditCard {@see model.bank.CreditCard}
+     * @param status    Account Status {@see model.enums.AccUserStatus}
+     * @param userID    User ID
+     */
     public BankAccount(long accountID, CreditCard card, AccUsrStatus status, long userID) {
         this.accountID = accountID;
         this.card = card;
@@ -73,11 +87,23 @@ public class BankAccount {
     }
 
     // пополнение
+
+    /**
+     * see {@link model.bank.CreditCard#funding(double)}
+     *
+     * @param fundingSum sum that being added to account
+     */
     public void funding(double fundingSum) {
         card.funding(fundingSum);
     }
 
     // снятие
+
+    /**
+     * see {@link model.bank.CreditCard#withdrawal(double)}
+     *
+     * @param withdrawalSum the amount to be deducted from the account
+     */
     public void withdrawal(double withdrawalSum) {
         card.withdrawal(withdrawalSum);
     }

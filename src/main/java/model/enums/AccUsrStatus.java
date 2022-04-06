@@ -1,5 +1,17 @@
 package model.enums;
 
+/**
+ * Enum that represents status of both User and Account.
+ */
 public enum AccUsrStatus {
-    BLOCKED, ACTIVE
+
+    /**
+     * Blocked Status
+     */
+    BLOCKED,
+
+    /**
+     * Active Status
+     */
+    ACTIVE
 }

@@ -8,7 +8,18 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * Utility class.
+ * Mostly sed to generate custom-length numbers
+ * and hash/validate user password.
+ */
 public final class Utility {
+    /**
+     * Method used to create random number with custom length.
+     *
+     * @param len length of number
+     * @return len-digit length random number
+     */
     public static long createRandomNumber(long len) {
         if (len > 18)
             throw new IllegalStateException("Too many digits");
@@ -24,6 +35,11 @@ public final class Utility {
         return Long.parseLong(tVal);
     }
 
+    /**
+     * Method used to create CardNumber for CreditCard.
+     *
+     * @return 16-digit valid CreditCard number
+     */
     public static long createCardNumber() {
         long cardNumber = createRandomNumber(16);
 
@@ -33,8 +49,14 @@ public final class Utility {
         return cardNumber;
     }
 
-    // Алгоритм Луна для валидации номера банковской карты
-    public static boolean validateCreditCardNumber(String value) {
+    /**
+     * Method used to check if CreditCard valid or not.
+     * Uses Luhn Algorithm.
+     *
+     * @param value string value of CreditCard number
+     * @return boolean value -> number valid: true; number invalid: false
+     */
+    private static boolean validateCreditCardNumber(String value) {
         int sum = Character.getNumericValue(value.charAt(value.length() - 1));
         int parity = value.length() % 2;
         for (int i = value.length() - 2; i >= 0; i--) {
@@ -49,11 +71,25 @@ public final class Utility {
     }
 
     // ---------------------  hardcoded bad practice, but works if input is CYRILLIC ------------------------
+
+    /**
+     * Encodes text from "ISO_8859_1" to "UTF_8".
+     * Java probably have better ways to do it...
+     *
+     * @param text input text
+     * @return encoded text
+     */
     public static String encode(String text) {
         byte[] bytes = text.getBytes(StandardCharsets.ISO_8859_1);
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
+    /**
+     * Method used to hash user password.
+     *
+     * @param password original password
+     * @return hashed password
+     */
     public static String hash(String password) {
         String strongPasswordHash = null;
         try {
@@ -95,6 +131,13 @@ public final class Utility {
             return hex;
     }
 
+    /**
+     * Method used to validate user password.
+     *
+     * @param originalPassword original user password
+     * @param storedPassword   hashed password from DB
+     * @return boolean value -> password valid: true; password invalid: false
+     */
     public static boolean validatePassword(String originalPassword, String storedPassword) {
         String[] parts = storedPassword.split(":");
         int iterations = Integer.parseInt(parts[0]);

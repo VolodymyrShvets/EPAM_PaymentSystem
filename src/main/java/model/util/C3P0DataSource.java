@@ -10,6 +10,12 @@ import java.io.InputStream;
 import java.sql.*;
 import java.util.Properties;
 
+/**
+ * Class, that represents Connection Pool.
+ * Uses C3P0 library.
+ * Code comments contains SQL script
+ * to create DB for project.
+ */
 public class C3P0DataSource {
     final static Logger logger = LogManager.getLogger(C3P0DataSource.class);
     private static C3P0DataSource instance;
@@ -30,12 +36,22 @@ public class C3P0DataSource {
         }
     }
 
+    /**
+     * Method used to get ConnectionPool instance.
+     *
+     * @return ConnectionPool instance
+     */
     public static C3P0DataSource getInstance() {
         if (instance == null)
             instance = new C3P0DataSource();
         return instance;
     }
 
+    /**
+     * Method used to get connection from ConnectionPool.
+     *
+     * @return DB connection
+     */
     public Connection getConnection() {
         Connection con = null;
         try {

@@ -1,5 +1,17 @@
 package model.enums;
 
+/**
+ * Enum that represents status of Payment.
+ */
 public enum PaymentStatus {
-    PREPARED, SENT    // подготовленный и отправленный платеж
+
+    /**
+     * Prepared Payment
+     */
+    PREPARED,
+
+    /**
+     * Sent Payment
+     */
+    SENT
 }

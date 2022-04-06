@@ -6,6 +6,9 @@ import model.util.Utility;
 
 import java.util.List;
 
+/**
+ * Class that represents User entity in system.
+ */
 public class User {
     private long userID;
     private AccUsrStatus status;
@@ -16,12 +19,26 @@ public class User {
     private String userPassword;
     private List<BankAccount> accounts;
 
+    /**
+     * Constructor used to create absolute new system User
+     * with Active Status {@see model.enums.AccUserStatus}
+     * and User Role {@see model.enums.UserRole}
+     */
     public User() {
         userID = Utility.createRandomNumber(9);
         status = AccUsrStatus.ACTIVE;
         userRole = UserRole.USER;
     }
 
+    /**
+     * Another constructor used to create User received from database.
+     *
+     * @param userID    user ID
+     * @param status    user status {@see model.enums.AccUserStatus}
+     * @param userRole  user role {@see model.enums.UserRole}
+     * @param firstName user first name
+     * @param lastName  user last name
+     */
     public User(long userID, AccUsrStatus status, UserRole userRole,
                 String firstName, String lastName) {
         this.userID = userID;
