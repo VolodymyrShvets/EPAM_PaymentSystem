@@ -29,6 +29,10 @@
         input:valid {
             border: 2px solid black;
         }
+
+        body {
+            background-color: lightgrey;
+        }
     </style>
 </head>
 <body>
@@ -40,7 +44,7 @@
     <h3><fmt:message key="label.newHere1"/><br><fmt:message key="label.newHere2"/></h3>
     </p>
 
-    <form action="<%= request.getContextPath()%>/register" method="post">
+    <form action="${pageContext.request.contextPath}/register" method="post">
         <table>
             <tr>
                 <td><fmt:message key="label.firstName"/></td>
@@ -71,8 +75,8 @@
     </form>
     <p>
         <fmt:message key="label.lang"/>
-        <a href="<%=request.getContextPath()%>/registration?sessionLocale=en">ENG</a>
-        <a href="<%=request.getContextPath()%>/registration?sessionLocale=ua">UA</a>
+        <a href="${pageContext.request.contextPath}/registration?sessionLocale=en">ENG</a>
+        <a href="${pageContext.request.contextPath}/registration?sessionLocale=ua">UA</a>
     </p>
 </div>
 </body>

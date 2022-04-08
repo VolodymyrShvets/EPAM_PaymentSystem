@@ -1,6 +1,5 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="java.util.List" %>
-<%@ page import="model.bank.BankAccount" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${sessionScope.lang}"/>
@@ -19,6 +18,10 @@
             font-size: larger;
             padding: 0 15px 0 15px;
         }
+
+        body {
+            background-color: lightgrey;
+        }
     </style>
 </head>
 <body>
@@ -28,21 +31,15 @@
     <h3><fmt:message key="label.accUnblockPage1"/><br><fmt:message key="label.accUnblockPage2"/>
         <br><fmt:message key="label.accUnblockPage3"/></h3>
     </p>
-    <form action="<%=request.getContextPath()%>/unblock" method="post">
-        <%
-            HttpSession session1 = request.getSession();
-            session1.setAttribute("accountID", request.getParameter("id"));
-        %>
+    <form action="${pageContext.request.contextPath}/unblock" method="post">
+        <c:set var="accountID" scope="session" value="${param.id}"/>
         <select name="accountID">
-            <% List<BankAccount> accounts = (List<BankAccount>) session.getAttribute("accountsList");
-                for (BankAccount account : accounts) {
-                    if (account.isBlocked()) { %>
-            <option><%=account.getAccountID()%>
-            </option>
-            <%
-                    }
-                }
-            %>
+            <c:forEach var="account" items="${accountsList}">
+                <c:if test="${account.isBlocked()}">
+                    <option><c:out value="${account.getAccountID()}"/>
+                    </option>
+                </c:if>
+            </c:forEach>
         </select>
         <p>
             <button type="submit"><fmt:message key="label.sendRequest"/></button>

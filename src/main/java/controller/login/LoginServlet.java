@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     final static Logger logger = LogManager.getLogger(LoginServlet.class);
-    private final LoginDao loginDao = new LoginDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -34,26 +33,29 @@ public class LoginServlet extends HttpServlet {
         loginBean.setUsername(userName);
         loginBean.setPassword(password);
 
+        LoginDao loginDao = new LoginDao();
+
         try {
             if (loginDao.validate(loginBean)) {
                 User user = loginDao.getUser(loginBean);
                 UserRole userRole = user.getUserRole();
                 HttpSession session = req.getSession();
                 session.setAttribute("userID", user.getUserID());
-                if (user.getStatus() == AccUsrStatus.BLOCKED) {
-                    logger.info("Attempt to login into blocked account: " + user.getUserID());
-                    RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/userunblock.jsp");
-                    dispatcher.forward(req, resp);
-                }
                 if (!userRole.equals(UserRole.ADMIN)) {
-                    logger.info("Login into account: " + user.getUserID());
-                    session.setAttribute("userName", user.getFirstName());
-                    List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
-                    List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
-                    session.setAttribute("accountsList", accounts);
-                    session.setAttribute("paymentsList", payments);
-                    RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
-                    dispatcher.forward(req, resp);
+                    if (user.getStatus() == AccUsrStatus.BLOCKED) {
+                        logger.info("Attempt to login into blocked account: " + user.getUserID());
+                        RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/userunblock.jsp");
+                        dispatcher.forward(req, resp);
+                    } else {
+                        logger.info("Login into account: " + user.getUserID());
+                        session.setAttribute("userName", user.getFirstName());
+                        List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
+                        List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
+                        session.setAttribute("accountsList", accounts);
+                        session.setAttribute("paymentsList", payments);
+                        RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
+                        dispatcher.forward(req, resp);
+                    }
                 } else {
                     logger.info("Login into ADMIN account.");
                     session.setAttribute("userName", user.getFirstName() + " " + user.getLastName());

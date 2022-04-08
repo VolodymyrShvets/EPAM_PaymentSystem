@@ -1,6 +1,5 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ page import="model.bank.BankAccount" %>
-<%@ page import="java.util.List" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.time.LocalDate" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
@@ -28,6 +27,10 @@
         input:valid {
             border: 2px solid black;
         }
+
+        body {
+            background-color: lightgrey;
+        }
     </style>
 </head>
 <body>
@@ -35,11 +38,8 @@
     <p>
     <h2><fmt:message key="label.paymentPageH2"/></h2>
     <h3><fmt:message key="label.paymentPage1"/><br><fmt:message key="label.paymentPage2"/></h3></p>
-    <form action="<%=request.getContextPath()%>/newPayment" method="post">
-        <%
-            HttpSession session1 = request.getSession();
-            session1.setAttribute("accountID", request.getParameter("id"));
-        %>
+    <form action="${pageContext.request.contextPath}/newPayment" method="post">
+        <c:set var="accountID" scope="session" value="${param.id}"/>
         <table>
             <tr>
                 <td>
@@ -47,16 +47,13 @@
                 </td>
                 <td>
                     <select name="senderID">
-                        <%
-                            List<BankAccount> accounts = (List<BankAccount>) session.getAttribute("accountsList");
-                            for (BankAccount account : accounts) {
-                                if (!account.isBlocked()) {%>
-                        <option value="<%=account.getAccountID()%>"><%=account.getAccountID() + " - " + account.getCard().getMoneyAmount()%>
-                        </option>
-                        <%
-                                }
-                            }
-                        %>
+                        <c:forEach var="account" items="${accountsList}">
+                            <c:if test="${!account.isBlocked()}">
+                                <option value="${account.getAccountID()}"><c:out
+                                        value="${account.getAccountID()}${' - '}${account.getCard().getMoneyAmount()}"/>
+                                </option>
+                            </c:if>
+                        </c:forEach>
                     </select>
                 </td>
             </tr>
@@ -82,7 +79,8 @@
                     <fmt:message key="label.paymentDate"/>
                 </td>
                 <td>
-                    <input id="payDate" type="date" name="paymentDate" value="<%=LocalDate.now()%>" min="<%=LocalDate.now()%>" required>
+                    <input id="payDate" type="date" name="paymentDate" value="${LocalDate.now()}"
+                           min="${LocalDate.now()}" required>
                 </td>
             </tr>
             <tr>
@@ -96,7 +94,7 @@
             </tr>
         </table>
         <p class="paymentError">${sessionScope.paymentError}</p>
-        <% session1.setAttribute("paymentError", "");%>
+        <c:set var="paymentError" value="" scope="request"/>
         <p>
             <button type="submit"><fmt:message key="label.pay"/></button>
         </p>

@@ -1,4 +1,5 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${sessionScope.lang}"/>
@@ -17,6 +18,10 @@
             font-size: larger;
             padding: 0 15px 0 15px;
         }
+
+        body {
+            background-color: lightgrey;
+        }
     </style>
 </head>
 <body>
@@ -26,13 +31,10 @@
     <h3><fmt:message key="label.accBlockPage1"/> <%=request.getParameter("id")%><br><fmt:message
             key="label.accBlockPage2"/>
         <br><fmt:message key="label.accBlockPage3"/></h3></p>
-    <form action="<%= request.getContextPath()%>/accstatuschanging" method="post">
-        <%
-            HttpSession session1 = request.getSession();
-            session1.setAttribute("accountID", request.getParameter("id"));
-        %>
+    <form action="${pageContext.request.contextPath}/accstatuschanging" method="post">
+        <c:set var="accountID" scope="session" value="${param.id}"/>
         <p>
-            <button type="submit"><fmt:message key="label.blockAcc"/> <%=request.getParameter("id")%>
+            <button type="submit"><fmt:message key="label.blockAcc"/> <c:out value="${accountID}"/>
             </button>
         </p>
     </form>

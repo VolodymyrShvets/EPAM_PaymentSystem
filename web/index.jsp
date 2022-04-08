@@ -1,4 +1,5 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
 <fmt:setLocale value="${sessionScope.lang}"/>
@@ -29,6 +30,10 @@
         input:valid {
             border: 2px solid black;
         }
+
+        body {
+            background-color: lightgrey;
+        }
     </style>
 </head>
 <body>
@@ -38,7 +43,7 @@
         <fmt:message key="label.welcome2"/></h1>
     <p>
     <h2><fmt:message key="label.login1"/></h2></p>
-    <form action="<%= request.getContextPath()%>/login" method="get">
+    <form action="${pageContext.request.contextPath}/login" method="get">
         <table>
             <tr>
                 <td><fmt:message key="label.login"/></td>
@@ -60,8 +65,8 @@
         <a href="${pageContext.request.contextPath}/registration"><fmt:message key="label.newProfile"/></a></p>
     <p>
         <fmt:message key="label.lang"/>
-        <a href="<%=request.getContextPath()%>/self-index?sessionLocale=en">ENG</a>
-        <a href="<%=request.getContextPath()%>/self-index?sessionLocale=ua">UA</a>
+        <a href="${pageContext.request.contextPath}/self-index?sessionLocale=en">ENG</a>
+        <a href="${pageContext.request.contextPath}/self-index?sessionLocale=ua">UA</a>
     </p>
 </div>
 </body>
