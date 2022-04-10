@@ -144,8 +144,9 @@
     <p><b><fmt:message key="label.sorting"/></b>
         <select name="paymentSortMethod">
             <option value="" disabled selected hidden><fmt:message key="label.disabledOption"/></option>
-            <option value="1"><fmt:message key="label.paySortVal1"/></option>
-            <option value="2"><fmt:message key="label.paySortVal2"/></option>
+            <option value="1"><fmt:message key="label.accSortVal1"/></option>
+            <option value="2"><fmt:message key="label.paySortVal1"/></option>
+            <option value="3"><fmt:message key="label.paySortVal2"/></option>
         </select>
         <button type="submit"><fmt:message key="label.SortShow"/></button>
     </p>

@@ -26,13 +26,17 @@ public class SortingServlet extends HttpServlet {
 
         if (paymentSortingType != null) {
             switch (Integer.parseInt(paymentSortingType)) {
-                case 1: { // oldest
+                case 1: { // ID
+                    payments.sort(Comparator.comparingLong(Payment::getPaymentID));
+                    break;
+                }
+                case 2: { // oldest
                     Comparator<Payment> compareID = Comparator.comparingLong(Payment::getPaymentID).reversed();
                     Comparator<Payment> compareDate = Comparator.comparing(Payment::getPaymentDate).reversed();
                     payments.sort(compareDate.thenComparing(compareID));
                     break;
                 }
-                case 2: { // newest
+                case 3: { // newest
                     Comparator<Payment> compareDate = Comparator.comparing(Payment::getPaymentDate);
                     Comparator<Payment> compareID = Comparator.comparingLong(Payment::getPaymentID);
                     payments.sort(compareDate.thenComparing(compareID));
