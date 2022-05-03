@@ -6,7 +6,7 @@ import model.bank.User;
 public class RegistrationDao {
     private final UserDAO userDAO = new UserDAO();
 
-    public int registerUser(User user) throws ClassNotFoundException{
+    public int registerUser(User user) {
         return userDAO.registerNewUser(user);
     }
 

@@ -1,6 +1,7 @@
 package controller.dao;
 
 import controller.login.LoginBean;
+import controller.login.LoginDao;
 import model.bank.*;
 import model.enums.AccUsrStatus;
 import model.enums.RequestType;
@@ -18,8 +19,14 @@ import java.util.List;
 
 public class UserDAO {
     final static Logger logger = LogManager.getLogger(UserDAO.class);
+    Connection connection;
 
     public UserDAO() {
+        connection = C3P0DataSource.getInstance().getConnection();
+    }
+
+    public UserDAO(Connection connection) {
+        this.connection = connection;
     }
 
     public List<User> unblockUser(User userB, boolean operation) {
@@ -31,7 +38,7 @@ public class UserDAO {
             else
                 userB.unblock();
 
-            try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+            try {
                 PreparedStatement userStatusUpdate = connection.prepareStatement("UPDATE Users SET userStatus = ? WHERE ID = ?");
 
                 userStatusUpdate.setString(1, userB.getStatus().name());
@@ -63,7 +70,7 @@ public class UserDAO {
                 "    FROM BankAccount AS BC LEFT JOIN CreditCard AS CC ON BC.card = CC.cardNumber\n" +
                 "    WHERE BC.userID = ?";
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_ACCOUNTS_QUERY);
             statement.setInt(1, Integer.parseInt(userID));
 
@@ -83,8 +90,6 @@ public class UserDAO {
         User user = null;
 
         try {
-            Connection connection = C3P0DataSource.getInstance().getConnection();
-
             PreparedStatement statement = connection.prepareStatement("select * from Users where userLogin = ?");
             statement.setString(1, userLogin);
 
@@ -106,7 +111,7 @@ public class UserDAO {
 
         String SQL_GET_ALL_USERS_QUERY = "SELECT ID, userStatus, userRole, firstName, lastName FROM Users";
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement usersStatement = connection.prepareStatement(SQL_GET_ALL_USERS_QUERY);
 
             ResultSet rs = usersStatement.executeQuery();
@@ -134,7 +139,7 @@ public class UserDAO {
     public boolean validateUserPassword(LoginBean loginBean) {
         boolean status = false;
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement("select userPassword from Users where userLogin = ? ");
             statement.setString(1, loginBean.getUsername());
 
@@ -153,10 +158,17 @@ public class UserDAO {
     }
 
     public int registerNewUser(User user) {
+        LoginBean loginBean = new LoginBean();
+        loginBean.setUsername(user.getUserLogin());
+        loginBean.setPassword(user.getUserPassword());
+
+        if (validateUserPassword(loginBean))
+            return 1;
+
         String INSERT_USER_SQL = "INSERT INTO Users VALUES (?, ?, ?, ?, ?, ?, ?)";
         int result = 0;
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement(INSERT_USER_SQL);
             statement.setObject(1, user.getUserID());
             statement.setString(2, user.getStatus().name());
@@ -168,7 +180,7 @@ public class UserDAO {
 
             result = statement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Caught Exception:", e);
         }
         return result;
     }

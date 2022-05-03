@@ -43,42 +43,38 @@ public class RegistrationServlet extends HttpServlet {
         user.setUserLogin(userLogin);
         user.setUserPassword(userPassword);
 
-        try {
-            logger.info("Checking if user already existed in database: " + userLogin);
+        logger.info("Checking if user already existed in database: " + userLogin);
 
-            if (loginDao.validate(loginBean)) {
-                user = loginDao.getUser(loginBean);
-                HttpSession session = req.getSession();
-                session.setAttribute("userID", user.getUserID());
-                session.setAttribute("userName", user.getFirstName());
-                List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
-                List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
-                session.setAttribute("accountsList", accounts);
-                session.setAttribute("paymentsList", payments);
-                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
-                dispatcher.forward(req, resp);
-            } else if (registrationDao.registerUser(user) == 1) {
-                logger.info("Check failed: " + userLogin + "  Attempt to create new.");
+        if (loginDao.validate(loginBean)) {
+            user = loginDao.getUser(loginBean);
+            HttpSession session = req.getSession();
+            session.setAttribute("userID", user.getUserID());
+            session.setAttribute("userName", user.getFirstName());
+            List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
+            List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
+            session.setAttribute("accountsList", accounts);
+            session.setAttribute("paymentsList", payments);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
+            dispatcher.forward(req, resp);
+        } else if (registrationDao.registerUser(user) == 1) {
+            logger.info("Check failed: " + userLogin + "  Attempt to create new.");
 
-                User newUser = registrationDao.getNameAndID(user);
-                String sessionName = newUser.getFirstName();
-                Long userID = newUser.getUserID();
-                HttpSession session = req.getSession();
-                session.setAttribute("userName", sessionName);
-                session.setAttribute("userID", userID);
-                session.setAttribute("accountsList", new ArrayList<>());
-                session.setAttribute("paymentsList", new ArrayList<>());
+            User newUser = registrationDao.getNameAndID(user);
+            String sessionName = newUser.getFirstName();
+            Long userID = newUser.getUserID();
+            HttpSession session = req.getSession();
+            session.setAttribute("userName", sessionName);
+            session.setAttribute("userID", userID);
+            session.setAttribute("accountsList", new ArrayList<>());
+            session.setAttribute("paymentsList", new ArrayList<>());
 
-                logger.info("New User successfully created: " + userID);
+            logger.info("New User successfully created: " + userID);
 
-                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
-                dispatcher.forward(req, resp);
-            } else {
-                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/register.jsp");
-                dispatcher.forward(req, resp);
-            }
-        } catch (ClassNotFoundException e) {
-            logger.error("Caught Exception: ", e);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
+            dispatcher.forward(req, resp);
+        } else {
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/register.jsp");
+            dispatcher.forward(req, resp);
         }
     }
 }

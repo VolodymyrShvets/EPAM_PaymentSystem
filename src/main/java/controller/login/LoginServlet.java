@@ -35,44 +35,41 @@ public class LoginServlet extends HttpServlet {
 
         LoginDao loginDao = new LoginDao();
 
-        try {
-            if (loginDao.validate(loginBean)) {
-                User user = loginDao.getUser(loginBean);
-                UserRole userRole = user.getUserRole();
-                HttpSession session = req.getSession();
-                session.setAttribute("userID", user.getUserID());
-                if (!userRole.equals(UserRole.ADMIN)) {
-                    if (user.getStatus() == AccUsrStatus.BLOCKED) {
-                        logger.info("Attempt to login into blocked account: " + user.getUserID());
-                        RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/userunblock.jsp");
-                        dispatcher.forward(req, resp);
-                    } else {
-                        logger.info("Login into account: " + user.getUserID());
-                        session.setAttribute("userName", user.getFirstName());
-                        List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
-                        List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
-                        session.setAttribute("accountsList", accounts);
-                        session.setAttribute("paymentsList", payments);
-                        RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
-                        dispatcher.forward(req, resp);
-                    }
+        if (loginDao.validate(loginBean)) {
+            User user = loginDao.getUser(loginBean);
+            UserRole userRole = user.getUserRole();
+            HttpSession session = req.getSession();
+            session.setAttribute("userID", user.getUserID());
+            if (!userRole.equals(UserRole.ADMIN)) {
+                if (user.getStatus() == AccUsrStatus.BLOCKED) {
+                    logger.info("Attempt to login into blocked account: " + user.getUserID());
+                    RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/userunblock.jsp");
+                    dispatcher.forward(req, resp);
                 } else {
-                    logger.info("Login into ADMIN account.");
-                    session.setAttribute("userName", user.getFirstName() + " " + user.getLastName());
-                    session.setAttribute("requests", loginDao.getAdminRequests());
-                    session.setAttribute("users", loginDao.getUsersForAdmin());
-                    RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/admin/admin.jsp");
+                    logger.info("Login into account: " + user.getUserID());
+                    session.setAttribute("userName", user.getFirstName());
+                    List<BankAccount> accounts = loginDao.getUserAccounts(String.valueOf(user.getUserID()));
+                    List<Payment> payments = loginDao.getUserPayments(String.valueOf(user.getUserID()));
+                    session.setAttribute("accountsList", accounts);
+                    session.setAttribute("paymentsList", payments);
+                    RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
                     dispatcher.forward(req, resp);
                 }
             } else {
-                logger.info(String.format("Invalid login or password: {%s}/{%s}", loginBean.getUsername(), loginBean.getPassword()));
-                HttpSession session = req.getSession();
-                session.setAttribute("loginResult", "Wrong password or username");
-                RequestDispatcher dispatcher = req.getRequestDispatcher("index.jsp");
+                logger.info("Login into ADMIN account.");
+                session.setAttribute("userName", user.getFirstName() + " " + user.getLastName());
+                session.setAttribute("requests", loginDao.getAdminRequests());
+                session.setAttribute("users", loginDao.getUsersForAdmin());
+                RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/admin/admin.jsp");
                 dispatcher.forward(req, resp);
             }
-        } catch (ClassNotFoundException e) {
-            logger.error("Caught Exception:", e);
+        } else {
+            logger.info(String.format("Invalid login or password: {%s}/{%s}", loginBean.getUsername(), loginBean.getPassword()));
+            HttpSession session = req.getSession();
+            session.setAttribute("loginResult", "Wrong password or username");
+            RequestDispatcher dispatcher = req.getRequestDispatcher("index.jsp");
+            dispatcher.forward(req, resp);
         }
+
     }
 }

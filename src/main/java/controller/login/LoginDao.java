@@ -13,7 +13,7 @@ import java.util.List;
 public class LoginDao {
     private final UserDAO userDAO = new UserDAO();
 
-    public boolean validate(LoginBean loginBean) throws ClassNotFoundException {
+    public boolean validate(LoginBean loginBean) {
         return userDAO.validateUserPassword(loginBean);
     }
 

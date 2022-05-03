@@ -1,8 +1,6 @@
 package controller.login;
 
-import java.io.Serializable;
-
-public class LoginBean implements Serializable {
+public class LoginBean {
     private String username;
     private String password;
 
