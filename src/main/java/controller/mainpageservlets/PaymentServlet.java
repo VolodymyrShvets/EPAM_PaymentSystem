@@ -35,11 +35,14 @@ public class PaymentServlet extends HttpServlet {
 
             session.setAttribute("paymentsList", payments);
             session.setAttribute("accountsList", accounts);
+
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
+            dispatcher.forward(req, resp);
         } else {
             session.setAttribute("paymentError", result);
-        }
 
-        RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
-        dispatcher.forward(req, resp);
+            RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/paymentpage.jsp");
+            dispatcher.forward(req, resp);
+        }
     }
 }

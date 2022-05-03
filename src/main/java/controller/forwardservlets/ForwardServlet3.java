@@ -13,6 +13,7 @@ public class ForwardServlet3 extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String destination = "/WEB-INF/views/user/paymentpage.jsp";
+        req.getSession().setAttribute("paymentError", "");
         RequestDispatcher dispatcher = req.getRequestDispatcher(destination);
         dispatcher.forward(req, resp);
     }
