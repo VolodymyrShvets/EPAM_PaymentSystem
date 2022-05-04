@@ -3,6 +3,7 @@ import model.bank.BankAccount;
 import model.enums.AccUsrStatus;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Connection;
@@ -20,6 +21,8 @@ public class TestAccount {
     static long account1ID;
     static BankAccount account2;
     static long account2ID;
+    static BankAccount account3;
+    static long account3ID;
 
     @BeforeAll
     static void init() {
@@ -33,9 +36,13 @@ public class TestAccount {
         account2 = new BankAccount();
         account2ID = account2.getAccountID();
         insertAccount(account2);
+        account3 = new BankAccount();
+        account3ID = account3.getAccountID();
+        insertAccount(account3);
     }
 
     @Test
+    @Order(1)
     public void testCreateNewAccount1() {
         AccountDAO dao = new AccountDAO(instance.getConnection());
         List<BankAccount> accounts = dao.createNewAccount(15);
@@ -44,6 +51,7 @@ public class TestAccount {
     }
 
     @Test
+    @Order(2)
     public void testCreateNewAccount2() {
         AccountDAO dao = new AccountDAO(instance.getConnection());
         List<BankAccount> accounts = dao.createNewAccount(15);
@@ -51,20 +59,21 @@ public class TestAccount {
     }
 
     @Test
+    @Order(3)
     public void testGetAccount1() {
         BankAccount actual = dao.getAccount(String.valueOf(account1ID));
-        actual.printAccountState();
         assertEquals(account1.toString(), actual.toString());
     }
 
     @Test
+    @Order(4)
     public void testGetAccount2() {
         BankAccount actual = dao.getAccount(String.valueOf(account2ID));
-        actual.printAccountState();
         assertEquals(account2.toString(), actual.toString());
     }
 
     @Test
+    @Order(4)
     public void testFundAccount1() {
         double fundingSum = 30.17;
         account1.funding(fundingSum);
@@ -74,6 +83,7 @@ public class TestAccount {
     }
 
     @Test
+    @Order(5)
     public void testFundAccount2() {
         double fundingSum = 23.09;
         account2.funding(fundingSum);
@@ -83,27 +93,31 @@ public class TestAccount {
     }
 
     @Test
+    @Order(6)
     public void testBlockAccount() {
-        dao.blockAccount(String.valueOf(account1ID));
+        dao.blockAccount(String.valueOf(account3ID));
+        BankAccount actual = dao.getAccount(String.valueOf(account3ID));
+        assertEquals(AccUsrStatus.BLOCKED, actual.getStatus());
+    }
+
+    @Test
+    @Order(7)
+    public void testChangeAccountStatus1() {
+        dao.changeAccountStatus(String.valueOf(account1ID), true);
         BankAccount actual = dao.getAccount(String.valueOf(account1ID));
         assertEquals(AccUsrStatus.BLOCKED, actual.getStatus());
     }
 
     @Test
-    public void testChangeAccountStatus1() {
-        dao.changeAccountStatus(String.valueOf(account2ID), true);
-        BankAccount actual = dao.getAccount(String.valueOf(account2ID));
-        assertEquals(AccUsrStatus.BLOCKED, actual.getStatus());
-    }
-
-    @Test
+    @Order(8)
     public void testChangeAccountStatus2() {
-        dao.changeAccountStatus(String.valueOf(account2ID), false);
-        BankAccount actual = dao.getAccount(String.valueOf(account2ID));
+        dao.changeAccountStatus(String.valueOf(account1ID), false);
+        BankAccount actual = dao.getAccount(String.valueOf(account1ID));
         assertEquals(AccUsrStatus.ACTIVE, actual.getStatus());
     }
 
     @Test
+    @Order(9)
     public void testUnblockAccountRequest() {
         // should define this method later, when complete all requests tests
     }
