@@ -114,4 +114,14 @@ public class BankAccount {
         System.out.println("\tBank.Account Status: " + status);
         System.out.println("\t" + card);
     }
+
+    @Override
+    public String toString() {
+        return "BankAccount{" +
+                "accountID=" + accountID +
+                ", card=" + card +
+                ", status=" + status +
+                ", userID=" + userID +
+                '}';
+    }
 }
