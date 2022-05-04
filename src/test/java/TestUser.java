@@ -16,7 +16,6 @@ public class TestUser {
     static C3P0Test instance;
     static User user1;
     static User user2;
-
     static UserDAO dao;
 
     @BeforeAll
@@ -36,25 +35,25 @@ public class TestUser {
     @Test
     public void testRegisterNewUser1() {
         //assertEquals(dao.registerNewUser(user1), 1);
-        assertNotEquals(dao.registerNewUser(user1), 1);
+        assertNotEquals(1, dao.registerNewUser(user1));
     }
 
     @Test
     public void testRegisterNewUser2() {
         //assertEquals(dao.registerNewUser(user2), 1);
-        assertNotEquals(dao.registerNewUser(user2), 1);
+        assertNotEquals(1, dao.registerNewUser(user2));
     }
 
     @Test
     public void testGetUser1() {
         //assertEquals(dao.registerNewUser(user2), 1);
-        //assertNotEquals(dao.registerNewUser(user2), 1);
+        assertNotEquals(dao.registerNewUser(user1), 1);
     }
 
     @Test
     public void testGetUser2() {
         //assertEquals(dao.registerNewUser(user2), 1);
-        //assertNotEquals(dao.registerNewUser(user2), 1);
+        assertNotEquals(dao.registerNewUser(user2), 1);
     }
 
     @Test
@@ -77,7 +76,6 @@ public class TestUser {
     public void testBlockUser() {
         //user1.setUserLogin("TakeshiKovacs");
         String userLogin = "TakeshiKovacs";
-        System.out.println(userLogin);
         User copy = user1;
 
         dao.unblockUser(user1, true);
@@ -87,9 +85,8 @@ public class TestUser {
         copy.setUserPassword("null");
 
         User result = dao.getUser(userLogin);
-        System.out.println("result : " + result);
-        System.out.println("copy: " + copy);
-        assertEquals(result.toString(), copy.toString());
+
+        assertEquals(copy.toString(), result.toString());
     }
 
     @Test
@@ -105,9 +102,8 @@ public class TestUser {
         copy.setUserPassword("null");
 
         User result = dao.getUser(userLogin);
-        System.out.println("result : " + result);
-        System.out.println("copy: " + copy);
-        assertEquals(result.toString(), copy.toString());
+
+        assertEquals(copy.toString(), result.toString());
     }
 
     @Test
@@ -120,20 +116,20 @@ public class TestUser {
         user1.setUserLogin("null");
         user1.setUserPassword("null");
 
-        assertEquals(users.get(0).toString(), user1.toString());
+        assertEquals(user1.toString(), users.get(0).toString());
 
         user2.setUserLogin("null");
         user2.setUserPassword("null");
-        assertEquals(users.get(1).toString(), user2.toString());
+        assertEquals(user2.toString(), users.get(1).toString());
     }
 
     @Test
     public void testGetAllUserAccounts1() {
-        assertEquals(dao.getAllUserAccounts(String.valueOf(user1.getUserID())), new ArrayList<>());
+        assertEquals(new ArrayList<>(), dao.getAllUserAccounts(String.valueOf(user1.getUserID())));
     }
 
     @Test
     public void testGetAllUserAccounts2() {
-        assertEquals(dao.getAllUserAccounts(String.valueOf(user2.getUserID())), new ArrayList<>());
+        assertEquals(new ArrayList<>(), dao.getAllUserAccounts(String.valueOf(user2.getUserID())));
     }
 }
