@@ -18,7 +18,14 @@ import java.util.List;
 public class AccountDAO {
     final static Logger logger = LogManager.getLogger(AccountDAO.class);
 
+    Connection connection;
+
     public AccountDAO() {
+        connection = C3P0DataSource.getInstance().getConnection();
+    }
+
+    public AccountDAO(Connection connection) {
+        this.connection = connection;
     }
 
     public BankAccount getAccount(String accountID) {
@@ -28,7 +35,7 @@ public class AccountDAO {
                 "    FROM BankAccount AS BC LEFT JOIN CreditCard AS CC ON BC.card = CC.cardNumber\n" +
                 "    WHERE BC.ID = ?";
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_ACCOUNTS_QUERY);
             statement.setInt(1, Integer.parseInt(accountID));
 
@@ -48,11 +55,10 @@ public class AccountDAO {
         List<BankAccount> list = null;
 
         account.block();
-        //account.printAccountState();
 
         logger.info("Attempt to Block Account.");
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement accountStatusUpdate = connection.prepareStatement("UPDATE BankAccount SET accountStatus = ? WHERE ID = ?");
 
             accountStatusUpdate.setString(1, account.getStatus().name());
@@ -60,8 +66,7 @@ public class AccountDAO {
 
             accountStatusUpdate.executeUpdate();
 
-            UserDAO userDAO = new UserDAO();
-            list = userDAO.getAllUserAccounts(String.valueOf(account.getUserID()));
+            list = new UserDAO(connection).getAllUserAccounts(String.valueOf(account.getUserID()));
         } catch (SQLException ex) {
             logger.error("Caught Exception: ", ex);
         }
@@ -80,7 +85,7 @@ public class AccountDAO {
         else
             account.unblock();
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement userStatusUpdate = connection.prepareStatement("UPDATE BankAccount SET accountStatus = ? WHERE ID = ?");
 
             userStatusUpdate.setString(1, account.getStatus().name());
@@ -94,7 +99,7 @@ public class AccountDAO {
 
             logger.info(String.format("Updated BankAccount status: for ID=%s STATUS=%s", account.getAccountID(), account.getStatus()));
 
-            list = new UserDAO().getAllUsers();
+            list = new UserDAO(connection).getAllUsers();
         } catch (SQLException ex) {
             logger.error("Caught Exception:", ex);
         }
@@ -108,7 +113,7 @@ public class AccountDAO {
 
         logger.info("Attempt to create new AccountRequest.");
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID, accountID) VALUES (?, ?, ?)";
             PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
             requestStatement.setString(1, request.getType().name());
@@ -132,7 +137,7 @@ public class AccountDAO {
 
         logger.info("Attempt to create New Account with ID=" + newAccount.getAccountID());
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement accountStatement = connection.prepareStatement(INSERT_BANK_ACCOUNT_SQL);
             PreparedStatement cardStatement = connection.prepareStatement(INSERT_CARD_SQL);
 
@@ -150,7 +155,7 @@ public class AccountDAO {
 
             accountStatement.executeUpdate();
 
-            accounts = new UserDAO().getAllUserAccounts(String.valueOf(userID));
+            accounts = new UserDAO(connection).getAllUserAccounts(String.valueOf(userID));
         } catch (SQLException e) {
             logger.error("Caught Exception:", e);
         }
@@ -164,10 +169,9 @@ public class AccountDAO {
         List<BankAccount> list = null;
         BankAccount account = getAccount(accountID);
 
-        //account.printAccountState();
         account.funding(fundSum);
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement moneyAmountUpdate = connection.prepareStatement("UPDATE CreditCard SET moneyAmount = ? WHERE cardNumber = ?");
 
             moneyAmountUpdate.setDouble(1, account.getCard().getMoneyAmount());
@@ -175,7 +179,7 @@ public class AccountDAO {
 
             moneyAmountUpdate.executeUpdate();
 
-            list = new UserDAO().getAllUserAccounts(String.valueOf(account.getUserID()));
+            list = new UserDAO(connection).getAllUserAccounts(String.valueOf(account.getUserID()));
         } catch (SQLException ex) {
             logger.error("Caught Exception:", ex);
         }
