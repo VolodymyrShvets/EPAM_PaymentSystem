@@ -1,6 +1,6 @@
 package controller.mainpageservlets;
 
-import controller.dao.AccountDAO;
+import controller.dao.RequestDAO;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -19,8 +19,8 @@ public class AccountUnblockingServlet extends HttpServlet {
         Long userID = (Long) session.getAttribute("userID");
         String accountID = req.getParameter("accountID");
 
-        AccountDAO dao = new AccountDAO();
-        dao.unblockAccountRequest(userID, accountID);
+        RequestDAO dao = new RequestDAO();
+        dao.newAccountUnblockingRequest(userID, accountID);
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("/WEB-INF/views/user/main.jsp");
         dispatcher.forward(req, resp);

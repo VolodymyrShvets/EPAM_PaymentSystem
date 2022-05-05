@@ -19,7 +19,7 @@ public class UserUnblockingServlet extends HttpServlet {
         Long userID = (Long) session.getAttribute("userID");
 
         RequestDAO dao = new RequestDAO();
-        String result = dao.createNewRequest(userID);
+        String result = dao.newUserUnblockingRequest(userID);
         session.setAttribute("loginResult", result);
 
         RequestDispatcher dispatcher = req.getRequestDispatcher("index.jsp");
