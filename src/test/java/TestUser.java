@@ -120,6 +120,7 @@ public class TestUser {
 
         user2.setUserLogin("null");
         user2.setUserPassword("null");
+        user2.block();
         assertEquals(user2.toString(), users.get(1).toString());
     }
 
