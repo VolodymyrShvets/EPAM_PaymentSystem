@@ -12,17 +12,23 @@ import java.util.List;
 
 public class RequestDAO {
     final static Logger logger = LogManager.getLogger(RequestDAO.class);
+    Connection connection;
 
     public RequestDAO() {
+        connection = C3P0DataSource.getInstance().getConnection();
     }
 
-    public String createNewRequest(long userID) {
+    public RequestDAO(Connection connection) {
+        this.connection = connection;
+    }
+
+    public String newUserUnblockingRequest(long userID) {
         logger.info("Attempt to create new UserRequest.");
 
         UserRequest request = new UserRequest();
         request.createUserUnblockingRequest(userID);
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID) VALUES (?, ?)";
             PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
             requestStatement.setString(1, request.getType().name());
@@ -38,12 +44,32 @@ public class RequestDAO {
         return "You successfully sent request to Admin.<br>Try another login later.";
     }
 
+    public void newAccountUnblockingRequest(long userID, String accountID) {
+        UserRequest request = new UserRequest();
+        request.createAccountUnblockingRequest(Long.parseLong(accountID), userID);
+
+        logger.info("Attempt to create new AccountRequest.");
+
+        try {
+            String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID, accountID) VALUES (?, ?, ?)";
+            PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
+            requestStatement.setString(1, request.getType().name());
+            requestStatement.setLong(2, request.getUserID());
+            requestStatement.setLong(3, request.getAccountID());
+
+            requestStatement.executeUpdate();
+        } catch (SQLException ex) {
+            logger.error("Caught Exception: ", ex);
+        }
+        logger.info("Created new AccountRequest for UserID=" + userID + " and AccountID=" + accountID);
+    }
+
     public List<UserRequest> getAllRequests() {
         List<UserRequest> requests = new ArrayList<>();
 
         String SQL_GET_USER_REQUESTS_QUERY = "SELECT * FROM Request";
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement(SQL_GET_USER_REQUESTS_QUERY);
 
             ResultSet rs = statement.executeQuery();
@@ -74,7 +100,7 @@ public class RequestDAO {
 
         DELETE_QUERY.append(" = ?");
 
-        try (Connection connection = C3P0DataSource.getInstance().getConnection()) {
+        try {
             PreparedStatement statement = connection.prepareStatement(DELETE_QUERY.toString());
             statement.setString(1, type.name());
             statement.setString(2, ID);
