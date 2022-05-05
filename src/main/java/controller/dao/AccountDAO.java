@@ -107,26 +107,6 @@ public class AccountDAO {
         return list;
     }
 
-    public void unblockAccountRequest(long userID, String accountID) {
-        UserRequest request = new UserRequest();
-        request.createAccountUnblockingRequest(Long.parseLong(accountID), userID);
-
-        logger.info("Attempt to create new AccountRequest.");
-
-        try {
-            String SQL_INSERT_NEW_REQUEST_QUERY = "INSERT INTO Request (requestType, userID, accountID) VALUES (?, ?, ?)";
-            PreparedStatement requestStatement = connection.prepareStatement(SQL_INSERT_NEW_REQUEST_QUERY);
-            requestStatement.setString(1, request.getType().name());
-            requestStatement.setLong(2, request.getUserID());
-            requestStatement.setLong(3, request.getAccountID());
-
-            requestStatement.executeUpdate();
-        } catch (SQLException ex) {
-            logger.error("Caught Exception: ", ex);
-        }
-        logger.info("Created new AccountRequest for UserID=" + userID + " and AccountID=" + accountID);
-    }
-
     public List<BankAccount> createNewAccount(long userID) {
         List<BankAccount> accounts = null;
         BankAccount newAccount = new BankAccount();
