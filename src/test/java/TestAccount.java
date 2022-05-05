@@ -116,12 +116,6 @@ public class TestAccount {
         assertEquals(AccUsrStatus.ACTIVE, actual.getStatus());
     }
 
-    @Test
-    @Order(9)
-    public void testUnblockAccountRequest() {
-        // should define this method later, when complete all requests tests
-    }
-
     public static void insertAccount(BankAccount account) {
         String INSERT_BANK_ACCOUNT_SQL = "INSERT INTO BankAccount VALUES (?, ?, ?, ?)";
         String INSERT_CARD_SQL = "INSERT INTO CreditCard VALUES (?, ?, ?, ?)";
