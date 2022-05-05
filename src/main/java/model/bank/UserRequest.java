@@ -22,7 +22,7 @@ public class UserRequest {
      * Method used to create new Account Unblocking Request.
      *
      * @param accountID bank account ID {@see model.bank.BankAccount}
-     * @param userID user account ID {@see model.bank.User}
+     * @param userID    user account ID {@see model.bank.User}
      */
     public void createAccountUnblockingRequest(long accountID, long userID) {
         this.accountID = accountID;
@@ -59,5 +59,22 @@ public class UserRequest {
 
     public RequestType getType() {
         return type;
+    }
+
+    @Override
+    public String toString() {
+        if (type.equals(RequestType.USER))
+            return "UserRequest{" +
+                    "requestID=" + requestID +
+                    ", userID=" + userID +
+                    ", type=" + type +
+                    '}';
+        else
+            return "UserRequest{" +
+                    "requestID=" + requestID +
+                    ", userID=" + userID +
+                    ", accountID=" + accountID +
+                    ", type=" + type +
+                    '}';
     }
 }

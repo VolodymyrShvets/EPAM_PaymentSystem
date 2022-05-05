@@ -85,6 +85,10 @@ public class Payment {
         this.paymentSum = paymentSum;
     }
 
+    public void setPaymentID(long paymentID) {
+        this.paymentID = paymentID;
+    }
+
     public long getPaymentID() {
         return paymentID;
     }
